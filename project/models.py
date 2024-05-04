@@ -1,5 +1,5 @@
 from django.db import models
-from general.models import BaseModel
+from general.models import BaseModel,CompanyBranch
 # Create your models here.
 
 PROJECT_TYPE_CHOICES = (
@@ -17,15 +17,7 @@ PROJECT_STATUS_CHOICES = (
     ('sold out', 'sold out'),
 )
 
-class CompanyLocation(BaseModel):
-    location = models.CharField(max_length=150,null=True,blank=True)
-    image = models.ImageField(upload_to='companylocation/image', null=True, blank=True)
-    iframe = models.TextField(null=True, blank=True)
-    class Meta:
-        db_table = 'CompanyLocations'
-        verbose_name = ('Company Locations')
-        verbose_name_plural = ('Company Locationss')
-        ordering = ('id',)
+
 
 class ProjectImage(BaseModel):
     images = models.ImageField(upload_to='projects/image', null=True, blank=True)
@@ -68,7 +60,7 @@ class Project(BaseModel):
     rera_number=models.CharField(max_length=500,blank=True,null=True)
     qr_code=models.ImageField(upload_to='projects/image',blank=True,null=True)
     location=models.CharField(max_length=500,blank=True,null=True) 
-    company_location = models.ForeignKey(CompanyLocation, on_delete=models.SET_NULL, null=True)
+    company_branch = models.ForeignKey(CompanyBranch, on_delete=models.SET_NULL, null=True)
     type = models.CharField(choices=PROJECT_TYPE_CHOICES, max_length=255)
     status = models.CharField(choices=PROJECT_STATUS_CHOICES, max_length=255)
     images = models.ManyToManyField(ProjectImage,related_name='project_images')

@@ -5,10 +5,30 @@ import uuid
 
 class BaseModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    auto_id = models.PositiveIntegerField(db_index=True,unique=True)
     date_added = models.DateTimeField(db_index=True,auto_now_add=True)
     date_updated = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False)
 
     class Meta:
         abstract = True
+
+
+class CompanyBranch(BaseModel):
+    location = models.CharField(max_length=150)
+    image = models.ImageField(upload_to='companybranch/image', null=True, blank=True)
+    iframe = models.TextField(null=True, blank=True)
+    address = models.TextField(null=True, blank=True)
+    email = models.CharField(max_length=255,null=True, blank=True)
+    phone_number = models.TextField(null=True, blank=True)
+    show_user_side = models.BooleanField(default=False)
+    is_deleted = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'companybranch'
+        verbose_name = ('Company Branch')
+        verbose_name_plural = ('Company Branchs')
+        ordering = ('date_added',)
+
+    def __str__(self):
+        return self.location
+    
