@@ -30,7 +30,7 @@ class ProjectImage(BaseModel):
         ordering = ('order',)
 
 class ProjectAmenities(BaseModel):
-    logo = models.ImageField(upload_to='projects/image', null=True, blank=True)
+    logo = models.FileField(upload_to='projects/image', null=True, blank=True)
     title = models.CharField(max_length=128, null=True, blank=True)
 
     class Meta:
@@ -105,6 +105,4 @@ class Enquiry(models.Model):
     
     def __str__(self):
         return str(self.enquiry_date)
-
-
 

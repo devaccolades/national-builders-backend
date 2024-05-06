@@ -1,5 +1,3 @@
-from uuid import UUID
-from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.response import Response
@@ -7,7 +5,6 @@ from rest_framework import status
 from rest_framework.permissions import IsAdminUser
 from .models import CompanyBranch
 from .serializer import *
-from national_builders.response_code import response_code
 
 # Create your views here.
 
@@ -86,8 +83,51 @@ class BranchAPIView(APIView):
             }
             return Response(response_data, status=status.HTTP_200_OK)
 
+# This function determines which branches are displayed on the user's frontend
+class BranchSelectionAPIView(APIView):
+    permission_classes = (IsAdminUser,)
+    
+    def patch(self, request, id):
+        instance = self.get_object(id)
+        if instance is None:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "message": "id Not Found"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+
+        serializer = CompanyBranchSerializer(instance, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            response_data = {
+                "StatusCode": 6000,
+                "detail": "Success",
+                "data": serializer.data
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        else:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "error",
+                "data": serializer.errors
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+    def get_object(self, pk):
+        try:
+            return CompanyBranch.objects.get(pk=pk, is_deleted=False)
+        except CompanyBranch.DoesNotExist:
+            return None
+
 
 class CompanyBranchDropdownListView(APIView):
     def get(self,request):
         instance = CompanyBranch.objects.filter(is_deleted=False)
-        return
+        serializer = CompanyBranchDropDownSerializer(instance, many=True)
+        response_data={
+            "StatusCode":6000,
+            "detail" : "Success",
+            "data": serializer.data
+            }
+        return Response(response_data,status=status.HTTP_200_OK)
