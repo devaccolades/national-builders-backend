@@ -8,7 +8,7 @@ from .serializer import *
 # Create your views here.
 
 class AmenitiesAPIView(APIView):
-    # permission_classes = (IsAdminUser,)
+    permission_classes = (IsAdminUser,)
     def post(self, request):
         serializer = AmenitiesSerializer(data=request.data)
         if serializer.is_valid():
@@ -78,5 +78,91 @@ class AmenitiesAPIView(APIView):
                 "StatusCode":6002,
                 "detail" : "error",
                 "message": "id Not Found"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+
+
+
+class ProjectApiView(APIView):
+      # permission_classes = (IsAdminUser,)
+    def post(self, request):
+        serializer = ProjectSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+            "StatusCode":6001,
+            "detail" : "Success",
+            "data": serializer.data,
+            "message" : "Project Added !"
+            }
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        else:
+            response_data={
+            "StatusCode":6002,
+            "detail" : "error",
+            "data": serializer.errors
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+    def get(self, request,slug=None):
+        if slug:
+            instance = self.get_object(slug)
+            if instance is not None:
+                serializer = ProjectSerializer(instance, context={'request': request})
+                response_data={
+                    "StatusCode":6000,
+                    "detail" : "Success",
+                    "data": serializer.data
+                    }
+                return Response(response_data,status=status.HTTP_200_OK)
+            else:
+                response_data={
+                    "StatusCode":6002,
+                    "detail" : "error",
+                    "message": 'Slug Not Found'
+                    }
+                return Response(response_data,status=status.HTTP_200_OK)
+        else:
+            instance = Project.objects.filter(is_deleted=False)
+            serializer = ProjectSerializer(instance, many=True, context={'request': request})
+            response_data={
+                "StatusCode":6000,
+                "detail" : "Success",
+                "data": serializer.data
+                }
+            return Response(response_data,status=status.HTTP_200_OK)
+        
+    def patch(self, request, slug):
+        instance = self.get_object(slug)
+        data = request.data.copy()
+        if 'qr_code' not in data or data['qr_code'] == "":
+            data['qr_code'] = instance.qr_code
+        if 'thumbnail' not in data or data['thumbnail'] == "":
+            data['thumbnail'] = instance.thumbnail
+        serializer = ProjectSerializer(instance, data=data,partial=True,context={'request': request})
+
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+                "StatusCode":6000,
+                "detail" : "Success",
+                "data": serializer.data,
+                "message": f'{instance.name} is Updated !'
+            }
+        else:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "data": serializer.errors
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def get_object(self, slug):
+        try:
+            return Project.objects.filter(slug=slug,is_deleted=False).first()
+        except Project.DoesNotExist:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "message": "slug Not Found"
             }
             return Response(response_data, status=status.HTTP_200_OK)
