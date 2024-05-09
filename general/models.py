@@ -32,3 +32,16 @@ class CompanyBranch(BaseModel):
     def __str__(self):
         return self.location
     
+
+class KeyHandOver(BaseModel):
+    name = models.CharField(max_length=255,null=True,blank=True)
+    image = models.ImageField(upload_to='keyhandover/image', null=True, blank=True)
+
+    class Meta:
+            db_table = 'keyhandover'
+            verbose_name = ('Key HandOver')
+            verbose_name_plural = ('Key HandOver')
+            ordering = ('-date_added',)
+
+    def __str__(self):
+        return self.name

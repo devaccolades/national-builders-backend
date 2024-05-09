@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CompanyBranch
+from .models import *
 
 class CompanyBranchSerializer(serializers.ModelSerializer):
     class Meta:  
@@ -14,3 +14,8 @@ class CompanyBranchDropDownSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyBranch
         fields = ['id', 'location']
+
+class KeyHandoverSeralizer(serializers.ModelSerializer):
+    class Meta:
+        model = KeyHandOver
+        fields = ['id', 'image','name']

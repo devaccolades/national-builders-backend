@@ -131,3 +131,34 @@ class CompanyBranchDropdownListView(APIView):
             "data": serializer.data
             }
         return Response(response_data,status=status.HTTP_200_OK)
+    
+
+class KeyHandOverAPIView(APIView):
+    # permission_classes = (IsAdminUser,)
+    def post(self, request):
+        serializer = KeyHandoverSeralizer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+            "StatusCode":6001,
+            "detail" : "Success",
+            "data": serializer.data
+            }
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        else:
+            response_data={
+            "StatusCode":6002,
+            "detail" : "error",
+            "data": serializer.errors
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+           
+    def get(self, request):
+        instance = KeyHandOver.objects.filter(is_deleted=False)
+        serializer = KeyHandoverSeralizer(instance, many=True, context={'request': request})
+        response_data={
+            "StatusCode":6000,
+            "detail" : "Success",
+            "data": serializer.data
+            }
+        return Response(response_data,status=status.HTTP_200_OK)

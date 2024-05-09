@@ -17,6 +17,10 @@ PROJECT_STATUS_CHOICES = (
     ('sold out', 'sold out'),
 )
 
+PROJECT_DISTANCE_CHOICES = (
+    ('km', 'km'),
+    ('meter', 'meter'),
+)
 
 
 
@@ -29,7 +33,7 @@ class ProjectAmenities(BaseModel):
         verbose_name = ('Project Amenitie')
         verbose_name_plural = ('Project Amenities')
         ordering = ('date_added',)
-
+ 
 
 class Project(BaseModel):
     name = models.CharField(max_length=255, unique=True)
@@ -61,25 +65,25 @@ class Project(BaseModel):
         return self.name
 
 class ProjectImages(BaseModel):
-    project=models.ForeignKey(Project,on_delete=models.CASCADE,null=True,blank=True)
+    project=models.ForeignKey(Project,on_delete=models.CASCADE)
     images = models.ImageField(upload_to='projects/image', null=True, blank=True)
     order = models.IntegerField(blank=True,null=True,default=1)
     class Meta:
         db_table = 'ProjectImages'
         verbose_name = ('Project Image')
         verbose_name_plural = ('Project Images')
-        ordering = ('order',)
+        ordering = ('date_added',)
 
 class FloorPlanImages(BaseModel):
-    project=models.ForeignKey(Project,on_delete=models.CASCADE,null=True,blank=True)
+    project=models.ForeignKey(Project,on_delete=models.CASCADE)
     images = models.ImageField(upload_to='projects/image', null=True, blank=True)
     title = models.CharField(max_length=255,blank=True,null=True)
     order = models.IntegerField(blank=True,null=True,default=1)
     class Meta:
         db_table = 'FloorlanImages'
-        verbose_name = ('Project Image')
-        verbose_name_plural = ('Project Images')
-        ordering = ('order',)
+        verbose_name = ('Floor Plan Image')
+        verbose_name_plural = ('Floor Plan Images')
+        ordering = ('date_added',)
 
 class ProjectSpecification(BaseModel):
     project=models.ForeignKey(Project,on_delete=models.CASCADE,null=True,blank=True)
@@ -93,8 +97,17 @@ class ProjectSpecification(BaseModel):
         ordering = ('date_added',)
 
 class ProjectDistance(BaseModel):
+    project=models.ForeignKey(Project,on_delete=models.CASCADE,null=True,blank=True)
     location_name = models.CharField(max_length=255,null=True,blank=True)
     distance = models.CharField(max_length=150,null=True,blank=True)
+    measurement_unit = models.CharField(choices=PROJECT_DISTANCE_CHOICES, max_length=255)
+
+    class Meta:
+        db_table = 'ProjectDistance'
+        verbose_name = ('Project Distance')
+        verbose_name_plural = ('Project Distance')
+        ordering = ('date_added',)
+
 
 
 class Enquiry(models.Model):
@@ -116,3 +129,20 @@ class Enquiry(models.Model):
     def __str__(self):
         return str(self.enquiry_date)
 
+class Rentals(BaseModel):
+    name = models.CharField(max_length=255, unique=True)
+    image = models.ImageField(upload_to='rentals/image', null=True, blank=True)
+    company_branch = models.ForeignKey(CompanyBranch, on_delete=models.SET_NULL, null=True)
+    type = models.CharField(choices=PROJECT_TYPE_CHOICES, max_length=255)
+    area = models.CharField(max_length=255,blank=True,null=True)
+    price = models.CharField(max_length=255,blank=True,null=True)
+    is_hide = models.BooleanField(default=False)
+
+    class Meta:
+        db_table='Rentals'
+        verbose_name = ('Rentals')
+        verbose_name_plural = ('Rentals')
+        ordering = ('-date_added',)
+
+    def __str__(self):
+        return str(self.name)
