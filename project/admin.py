@@ -4,3 +4,8 @@ from .models import *
 
 admin.site.register(Project)
 admin.site.register(ProjectAmenities)
+admin.site.register(ProjectSpecification)
+admin.site.register(ProjectImages)
+admin.site.register(FloorPlanImages)
+admin.site.register(ProjectDistance)
+admin.site.register(Rentals)

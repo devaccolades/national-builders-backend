@@ -6,6 +6,9 @@ urlpatterns = [
     
     path('branch-selection/<uuid:id>/', BranchSelectionAPIView.as_view(), name='branch-userside-selection'),
     path('company-branches-dropdown/', CompanyBranchDropdownListView.as_view(), name='company-branch-dropdown-list'),
+    
+    path('key-handover/', KeyHandOverAPIView.as_view(), name='key-handdover-get-add'),
+
 
 ]
 

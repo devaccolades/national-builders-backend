@@ -84,7 +84,7 @@ class AmenitiesAPIView(APIView):
 
 
 class ProjectApiView(APIView):
-      # permission_classes = (IsAdminUser,)
+    # permission_classes = (IsAdminUser,)
     def post(self, request):
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
@@ -107,11 +107,11 @@ class ProjectApiView(APIView):
         if slug:
             instance = self.get_object(slug)
             if instance is not None:
-                serializer = ProjectSerializer(instance, context={'request': request})
+                serializer = ProjectListSerializer(instance, context={'request': request})
                 response_data={
                     "StatusCode":6000,
                     "detail" : "Success",
-                    "data": serializer.data
+                    "data": serializer.data,
                     }
                 return Response(response_data,status=status.HTTP_200_OK)
             else:
@@ -123,7 +123,7 @@ class ProjectApiView(APIView):
                 return Response(response_data,status=status.HTTP_200_OK)
         else:
             instance = Project.objects.filter(is_deleted=False)
-            serializer = ProjectSerializer(instance, many=True, context={'request': request})
+            serializer = ProjectListSerializer(instance, many=True, context={'request': request})
             response_data={
                 "StatusCode":6000,
                 "detail" : "Success",
@@ -156,6 +156,29 @@ class ProjectApiView(APIView):
             }
         return Response(response_data, status=status.HTTP_200_OK)
     
+    def delete(self, request, id):
+        instance = self.get_object_id(id)
+        instance.is_deleted = True 
+        instance.save()
+        response_data={
+                "StatusCode":6000,
+                "detail" : "error",
+                "data" : "",
+                "message": "Project Deleted !"
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def get_object_id(self, id):
+        try:
+            return Project.objects.filter(id=id,is_deleted=False).first()
+        except Project.DoesNotExist:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "message": "slug Not Found"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+    
     def get_object(self, slug):
         try:
             return Project.objects.filter(slug=slug,is_deleted=False).first()
@@ -164,5 +187,464 @@ class ProjectApiView(APIView):
                 "StatusCode":6002,
                 "detail" : "error",
                 "message": "slug Not Found"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+
+class ProjectImagesApiView(APIView):
+    # permission_classes = (IsAdminUser,)
+    def post(self, request):
+        serializer = ProjectImageSaveSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+            "StatusCode":6001,
+            "detail" : "Success",
+            "data": serializer.data,
+            "message" : "Images added successfully!"
+            }
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        else:
+            response_data={
+            "StatusCode":6002,
+            "detail" : "error",
+            "data": serializer.errors
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+    def get(self, request, projectId):
+        try:
+            instance = ProjectImages.objects.filter(project=projectId, is_deleted=False)
+            serializer = ProjectImageSerializer(instance, many=True, context={'request': request})
+            response_data = {
+                "StatusCode": 6000,
+                "detail": "Success",
+                "data": serializer.data,
+                "message" : "Success"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        except ProjectImages.DoesNotExist:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "Error",
+                "message": "Project id Not Found",
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+    def patch(self, request, id):
+        instance = self.get_object(id)
+        serializer = ProjectImageSerializer(instance, data=request.data,partial=True,context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+                "StatusCode":6000,
+                "detail" : "Success",
+                "data": serializer.data,
+                "message": 'Image is Updated !'
+            }
+        else:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "data": serializer.errors
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    def delete(self, request, id):
+        instance = self.get_object(id)
+        instance.is_deleted = True 
+        instance.save()
+        response_data={
+                "StatusCode":6000,
+                "detail" : "error",
+                "data" : "",
+                "message": "Image Deleted Deleted"
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+
+    def get_object(self, id):
+        try:
+            return ProjectImages.objects.filter(id=id,is_deleted=False).first()
+        except ProjectImages.DoesNotExist:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "message": "id Not Found"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+class FloorPlanImagesApiView(APIView):
+    def post(self, request):
+        serializer = FloorPlanSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+            "StatusCode":6001,
+            "detail" : "Success",
+            "data": serializer.data,
+            "message" : "Images added successfully!"
+            }
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        else:
+            response_data={
+            "StatusCode":6002,
+            "detail" : "error",
+            "data": serializer.errors
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+    def get(self, request, projectId):
+        try:
+            instance = FloorPlanImages.objects.filter(project=projectId, is_deleted=False)
+            serializer = FloorPlanSerializer(instance, many=True, context={'request': request})
+            response_data = {
+                "StatusCode": 6000,
+                "detail": "Success",
+                "data": serializer.data,
+                "message" : "Success"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        except ProjectImages.DoesNotExist:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "Error",
+                "message": "Project id Not Found",
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+    def patch(self, request, id):
+        instance = self.get_object(id)
+        data = request.data.copy()
+        if 'images' not in data or data['images'] == "":
+            data['images'] = instance.images
+        serializer = FloorPlanSerializer(instance, data=data,partial=True,context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+                "StatusCode":6000,
+                "detail" : "Success",
+                "data": serializer.data,
+                "message": 'Image is Updated !'
+            }
+        else:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "data": serializer.errors
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def delete(self, request, id):
+        instance = self.get_object(id)
+        instance.is_deleted = True 
+        instance.save()
+        response_data={
+                "StatusCode":6000,
+                "detail" : "error",
+                "data" : "",
+                "message": "Image Deleted Deleted"
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def get_object(self, id):
+        try:
+            return FloorPlanImages.objects.filter(id=id,is_deleted=False).first()
+        except FloorPlanImages.DoesNotExist:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "message": "id Not Found"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+
+class ProjectAmenitiesAPIView(APIView):
+    def get(self, request, projectId):
+        try:
+            project = Project.objects.filter(id=projectId).first()
+            amenities_ids = project.amenities.filter(is_deleted=False).values_list('id', flat=True)
+            response_data = {
+                "StatusCode": 6000,
+                "detail": "Success",
+                "data": amenities_ids,
+                "message" : "Success"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        except ProjectImages.DoesNotExist:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "Error",
+                "message": "Project id Not Found",
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+    def patch(self, request, projectId):
+        try:
+            
+            project = Project.objects.filter(id=projectId).first()
+            amenities_ids = []
+            for key,value in request.data.items():
+                amenities_ids.append(value)
+            amenities_to_add = ProjectAmenities.objects.filter(id__in=amenities_ids)
+            project.amenities.clear() 
+            project.amenities.add(*amenities_to_add)
+            amenities = project.amenities.filter(is_deleted=False).values_list('id',flat=True)
+
+            print()
+            response_data = {
+                "StatusCode": 6000,
+                "detail": "Success",
+                "data": list(amenities),
+                "message" : "Success"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        except ProjectImages.DoesNotExist:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "Error",
+                "message": "Project id Not Found",
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+
+class SpecificationsApiView(APIView):
+    def post(self, request):
+        serializer = SpecificationsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+            "StatusCode":6001,
+            "detail" : "Success",
+            "data": serializer.data,
+            "message" : "Specifications added successfully!"
+            }
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        else:
+            response_data={
+            "StatusCode":6002,
+            "detail" : "error",
+            "data": serializer.errors
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+    def get(self, request, projectId):
+        try:
+            instance = ProjectSpecification.objects.filter(project=projectId, is_deleted=False)
+            serializer = SpecificationsSerializer(instance, many=True)
+            response_data = {
+                "StatusCode": 6000,
+                "detail": "Success",
+                "data": serializer.data,
+                "message" : "Success"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        except ProjectImages.DoesNotExist:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "Error",
+                "message": "Project id Not Found",
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+    def patch(self, request, id):
+        instance = self.get_object(id)
+        serializer = SpecificationsSerializer(instance, data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+                "StatusCode":6000,
+                "detail" : "Success",
+                "data": serializer.data,
+                "message": 'Specification is Updated !'
+            }
+        else:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "data": serializer.errors
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def delete(self, request, id):
+        instance = self.get_object(id)
+        instance.is_deleted = True 
+        instance.save()
+        response_data={
+                "StatusCode":6000,
+                "detail" : "error",
+                "data" : "",
+                "message": "Specification Deleted !"
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+        
+    def get_object(self, id):
+        try:
+            return ProjectSpecification.objects.filter(id=id,is_deleted=False).first()
+        except ProjectSpecification.DoesNotExist:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "message": "id Not Found"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+
+    
+
+class DistanceApiView(APIView):
+    def post(self, request):
+        serializer = DistanceSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+            "StatusCode":6001,
+            "detail" : "Success",
+            "data": serializer.data,
+            "message" : "Near By added successfully!"
+            }
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        else:
+            response_data={
+            "StatusCode":6002,
+            "detail" : "error",
+            "data": serializer.errors
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+
+    def get(self, request, projectId):
+        try:
+            instance = ProjectDistance.objects.filter(project=projectId, is_deleted=False)
+            serializer = DistanceSerializer(instance, many=True)
+            response_data = {
+                "StatusCode": 6000,
+                "detail": "Success",
+                "data": serializer.data,
+                "message" : "Success"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        except ProjectImages.DoesNotExist:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "Error",
+                "message": "Project id Not Found",
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+    def patch(self, request, id):
+        instance = self.get_object(id)
+        serializer = DistanceSerializer(instance, data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+                "StatusCode":6000,
+                "detail" : "Success",
+                "data": serializer.data,
+                "message": 'Near By is Updated !'
+            }
+        else:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "data": serializer.errors
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def delete(self, request, id):
+        instance = self.get_object(id)
+        instance.is_deleted = True 
+        instance.save()
+        response_data={
+                "StatusCode":6000,
+                "detail" : "error",
+                "data" : "",
+                "message": "Near By Deleted !"
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def get_object(self, id):
+        try:
+            return ProjectDistance.objects.filter(id=id,is_deleted=False).first()
+        except ProjectDistance.DoesNotExist:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "message": "id Not Found"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+
+class RentalsAPIView(APIView):
+    def post(self, request):
+        serializer = RentalsSaveSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+            "StatusCode":6001,
+            "detail" : "Success",
+            "data": serializer.data,
+            "message" : "Rentals added !"
+            }
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        else:
+            response_data={
+            "StatusCode":6002,
+            "detail" : "error",
+            "data": serializer.errors
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+
+    def get(self, request):
+        instance = Rentals.objects.filter(is_deleted=False)
+        serializer = RentalsSerializer(instance, many=True,context={'request': request})
+        response_data = {
+            "StatusCode": 6000,
+            "detail": "Success",
+            "data": serializer.data,
+            "message" : "Success"
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+        
+    def patch(self, request, id):
+        instance = self.get_object(id)
+        data = request.data.copy()
+        if 'image' not in data or data['image'] == "":
+            data['image'] = instance.image
+        serializer = RentalsSaveSerializer(instance, data=data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+                "StatusCode":6000,
+                "detail" : "Success",
+                "data": serializer.data,
+                "message": 'Rentals Updated !'
+            }
+        else:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "data": serializer.errors
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def delete(self, request, id):
+        instance = self.get_object(id)
+        instance.is_deleted = True 
+        instance.save()
+        response_data={
+                "StatusCode":6000,
+                "detail" : "error",
+                "data" : "",
+                "message": "Rentals Deleted !"
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def get_object(self, id):
+        try:
+            return Rentals.objects.filter(id=id,is_deleted=False).first()
+        except Rentals.DoesNotExist:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "message": "id Not Found"
             }
             return Response(response_data, status=status.HTTP_200_OK)
