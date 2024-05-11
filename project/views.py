@@ -5,6 +5,10 @@ from rest_framework import status
 from rest_framework.permissions import IsAdminUser
 from .models import ProjectAmenities
 from .serializer import *
+import csv
+from django.http import HttpResponse
+
+
 # Create your views here.
 
 class AmenitiesAPIView(APIView):
@@ -84,7 +88,7 @@ class AmenitiesAPIView(APIView):
 
 
 class ProjectApiView(APIView):
-    # permission_classes = (IsAdminUser,)
+    permission_classes = (IsAdminUser,)
     def post(self, request):
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
@@ -192,7 +196,7 @@ class ProjectApiView(APIView):
         
 
 class ProjectImagesApiView(APIView):
-    # permission_classes = (IsAdminUser,)
+    permission_classes = (IsAdminUser,)
     def post(self, request):
         serializer = ProjectImageSaveSerializer(data=request.data)
         if serializer.is_valid():
@@ -274,6 +278,7 @@ class ProjectImagesApiView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
         
 class FloorPlanImagesApiView(APIView):
+    permission_classes = (IsAdminUser,)
     def post(self, request):
         serializer = FloorPlanSerializer(data=request.data)
         if serializer.is_valid():
@@ -358,6 +363,7 @@ class FloorPlanImagesApiView(APIView):
         
 
 class ProjectAmenitiesAPIView(APIView):
+    permission_classes = (IsAdminUser,)
     def get(self, request, projectId):
         try:
             project = Project.objects.filter(id=projectId).first()
@@ -407,6 +413,7 @@ class ProjectAmenitiesAPIView(APIView):
         
 
 class SpecificationsApiView(APIView):
+    permission_classes = (IsAdminUser,)
     def post(self, request):
         serializer = SpecificationsSerializer(data=request.data)
         if serializer.is_valid():
@@ -490,6 +497,7 @@ class SpecificationsApiView(APIView):
     
 
 class DistanceApiView(APIView):
+    permission_classes = (IsAdminUser,)
     def post(self, request):
         serializer = DistanceSerializer(data=request.data)
         if serializer.is_valid():
@@ -573,6 +581,7 @@ class DistanceApiView(APIView):
         
 
 class RentalsAPIView(APIView):
+    permission_classes = (IsAdminUser,)
     def post(self, request):
         serializer = RentalsSaveSerializer(data=request.data)
         if serializer.is_valid():
@@ -648,3 +657,84 @@ class RentalsAPIView(APIView):
                 "message": "id Not Found"
             }
             return Response(response_data, status=status.HTTP_200_OK)
+        
+
+class ProjectDropDownList(APIView):
+    # permission_classes = (IsAdminUser,)
+    def get(self,request):
+        instance = Project.objects.filter(is_deleted=False)
+        serializer = ProjectDropDownListSerializer(instance, many=True)
+        response_data={
+            "StatusCode":6000,
+            "detail" : "Success",
+            "data": serializer.data
+            }
+        return Response(response_data,status=status.HTTP_200_OK)
+
+class EnquiryAPIView(APIView):
+    permission_classes = (IsAdminUser,)
+    
+    def get(self, request):
+        instance = Enquiry.objects.filter(is_deleted=False)
+        serializer = EnquirySerializer(instance, many=True)
+        response_data = {
+            "StatusCode": 6000,
+            "detail": "Success",
+            "data": serializer.data,
+            "message" : "Success"
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def patch(self, request, id):
+        instance = self.get_object(id)
+        serializer = EnquirySerializer(instance, data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+                "StatusCode":6000,
+                "detail" : "Success",
+                "data": serializer.data,
+                "message": 'Enqury Read !'
+            }
+        else:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "data": serializer.errors
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def get_object(self, id):
+        try:
+            return Enquiry.objects.filter(id=id,is_deleted=False).first()
+        except Enquiry.DoesNotExist:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "message": "id Not Found"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+class EnquiryDownloadAPIView(APIView):
+    # permission_classes = (IsAdminUser,)
+    def get(self, request):
+        try:
+            instance = Enquiry.objects.filter(is_deleted=False)
+            serializer = EnquiryDownloadSerializer(instance,many=True)
+            response = HttpResponse(
+            content_type='text/csv',
+            )
+            response['Content-Disposition'] = 'attachment; filename="EnquiryData.csv"'
+
+            writer = csv.writer(response)
+            writer.writerow(['Name', 'Email', 'Phone', 'Message','Project Name','Enquiry_date'])
+            for enquiry in serializer.data:
+                writer.writerow(list(enquiry.values()))
+            return response
+        except:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                 "message": str(e)
+            }
+            return Response(response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

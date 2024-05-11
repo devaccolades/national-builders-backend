@@ -1,6 +1,6 @@
 from django.db import models
 import uuid
-
+from ckeditor.fields import RichTextField
 # Create your models here.
 
 class BaseModel(models.Model):
@@ -45,3 +45,56 @@ class KeyHandOver(BaseModel):
 
     def __str__(self):
         return self.name
+        
+    
+class Testimonieals(BaseModel):
+    name = models.CharField(max_length=255,null=True,blank=True)
+    image = models.ImageField(upload_to='testimonieals/image', null=True, blank=True)
+    project=models.ForeignKey('project.Project',on_delete=models.CASCADE,null=True,blank=True)
+    description = models.TextField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'testimonieals'
+        verbose_name = ('Testimonieal')
+        verbose_name_plural = ('Testimoniealss')
+        ordering = ('-date_added',)
+
+    def __str__(self):
+        return self.name
+
+class Blogs(BaseModel):
+    image=models.ImageField(upload_to='blogs/image',blank=True,null=True)
+    title = models.CharField(max_length=300, blank=True, default='',null=True)
+    body = RichTextField(blank=True)
+    image_alt = models.CharField(max_length=125, null=True, blank=True)
+    meta_tag=models.CharField(max_length=300, blank=True, default='',null=True)
+    meta_description=models.CharField(max_length=300, blank=True, default='',null=True)
+    slug = models.SlugField(default="", unique=True)
+
+    class Meta:
+        db_table = 'Blogs'
+        verbose_name = 'Blog'
+        verbose_name_plural = 'Blogs'
+        ordering = ('-date_added',)
+
+    def __str__(self):
+        return str(self.title)
+    
+class NewAndEvents(BaseModel):
+    image=models.ImageField(upload_to='blogs/image',blank=True,null=True)
+    title = models.CharField(max_length=300, blank=True, default='',null=True)
+    body = RichTextField(blank=True)
+    image_alt = models.CharField(max_length=125, null=True, blank=True)
+    youtube_link = models.CharField(max_length=255, blank=True, null=True)
+    meta_tag=models.CharField(max_length=300, blank=True, default='',null=True)
+    meta_description=models.CharField(max_length=300, blank=True, default='',null=True)
+    slug = models.SlugField(default="", unique=True)
+
+    class Meta:
+        db_table = 'newandevents'
+        verbose_name = 'New And Event'
+        verbose_name_plural = 'New And Events'
+        ordering = ('-date_added',)
+
+    def __str__(self):
+        return str(self.title)

@@ -35,6 +35,13 @@ urlpatterns = [
     
     path('rental/', RentalsAPIView.as_view(), name='rental-add-get'),
     path('rental/<uuid:id>/', RentalsAPIView.as_view(), name='rental-update-delete'),
+   
+    path('project-dropdown-list/', ProjectDropDownList.as_view(), name='project-dropdown-list'),
+    
+    path('enquiry-list/', EnquiryAPIView.as_view(), name='enquiry-list'),
+    path('enquiry/<int:id>/', EnquiryAPIView.as_view(), name='enquiry-list'),
+  
+    path('enquiry-download/', EnquiryDownloadAPIView.as_view(), name='enquiry-download'),
 
     
 
