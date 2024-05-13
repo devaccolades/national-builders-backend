@@ -18,6 +18,9 @@ urlpatterns = [
    
     path('news-and-events/', NewsAndEventsAPIView.as_view(), name='news-and-events-get-add'),
     path('news-and-events/<uuid:id>/', NewsAndEventsAPIView.as_view(), name='news-and-events-update-delete'),
+    
+    path('seo/', SeoAPIView.as_view(), name='seo-get-post'),
+    path('seo/<uuid:id>/', SeoAPIView.as_view(), name='seo-update-delete'),
 
 
 ]

@@ -195,6 +195,19 @@ class ProjectApiView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
         
 
+class ProjectCountAPIView(APIView):
+    permission_classes = (IsAdminUser,)
+    def get(self,request):
+        instace_count  = Project.objects.filter(is_deleted=False).count()
+        response_data={
+            "StatusCode":6000,
+            "detail" : "Success",
+            "data": instace_count,
+            "message" : "success!"
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+
+
 class ProjectImagesApiView(APIView):
     permission_classes = (IsAdminUser,)
     def post(self, request):
@@ -618,7 +631,7 @@ class RentalsAPIView(APIView):
         data = request.data.copy()
         if 'image' not in data or data['image'] == "":
             data['image'] = instance.image
-        serializer = RentalsSaveSerializer(instance, data=data,partial=True)
+        serializer = RentalsSerializer(instance, data=data,partial=True)
         if serializer.is_valid():
             serializer.save()
             response_data={
@@ -658,7 +671,36 @@ class RentalsAPIView(APIView):
             }
             return Response(response_data, status=status.HTTP_200_OK)
         
-
+class RentalsUpdateAPIView(APIView):
+    def patch(self, request, id):
+        instance = self.get_object(id)
+        serializer = RentalsSaveSerializer(instance, data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+                "StatusCode":6000,
+                "detail" : "Success",
+                "data": serializer.data,
+                "message": 'Rentals Updated !'
+            }
+        else:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "data": serializer.errors
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    def get_object(self, id):
+        try:
+            return Rentals.objects.filter(id=id,is_deleted=False).first()
+        except Rentals.DoesNotExist:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "message": "id Not Found"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
 class ProjectDropDownList(APIView):
     # permission_classes = (IsAdminUser,)
     def get(self,request):

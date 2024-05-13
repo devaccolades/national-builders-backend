@@ -44,3 +44,8 @@ class NewsAndEventsSeralizer(serializers.ModelSerializer):
     class Meta:
         model = NewAndEvents
         fields = ['id','image','title','body','youtube_link','image_alt','meta_tag','meta_description','slug']
+
+class SeoSeralizer(serializers.ModelSerializer):
+    class Meta:
+        model = SEO
+        fields = ['id','page','path','meta_title','meta_description']

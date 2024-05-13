@@ -445,3 +445,80 @@ class NewsAndEventsAPIView(APIView):
                 "message": "id Not Found"
             }
             return Response(response_data, status=status.HTTP_200_OK)
+        
+
+class SeoAPIView(APIView):
+    permission_classes = (IsAdminUser,)
+    def post(self, request):
+        serializer = SeoSeralizer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+            "StatusCode":6001,
+            "detail" : "Success",
+            "data": serializer.data,
+            "message" : "Seo Added !"
+            }
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        else:
+            response_data={
+            "StatusCode":6002,
+            "detail" : "error",
+            "data": serializer.errors,
+            "message" : "error"
+
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+           
+    def get(self, request):
+        instance = SEO.objects.filter(is_deleted=False)
+        serializer = SeoSeralizer(instance, many=True)
+        response_data={
+            "StatusCode":6000,
+            "detail" : "Success",
+            "data": serializer.data
+            }
+        return Response(response_data,status=status.HTTP_200_OK)
+    
+    def patch(self, request, id):
+        instance = self.get_object(id)
+        serializer = SeoSeralizer(instance, data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+                "StatusCode":6000,
+                "detail" : "Success",
+                "data": serializer.data,
+                "message" : "Seo Updated !"
+            }
+        else:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "data": serializer.errors
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def delete(self, request, id):
+        instance = self.get_object(id)
+        instance.is_deleted = True 
+        instance.save()
+        response_data={
+                "StatusCode":6000,
+                "detail" : "error",
+                "data" : "",
+                "message": "Seo Deleted"
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def get_object(self, id):
+        try:
+            return SEO.objects.filter(id=id,is_deleted=False).first()
+        except SEO.DoesNotExist:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "message": "id Not Found"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
