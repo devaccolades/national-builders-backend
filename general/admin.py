@@ -4,3 +4,7 @@ from .models import *
 
 admin.site.register(CompanyBranch)
 admin.site.register(KeyHandOver)
+admin.site.register(Testimonieals)
+admin.site.register(Blogs)
+admin.site.register(NewAndEvents)
+admin.site.register(SEO)

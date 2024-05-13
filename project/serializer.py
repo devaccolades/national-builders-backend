@@ -29,7 +29,11 @@ class ProjectListSerializer(serializers.ModelSerializer):
         model = Project
         fields = ['id','name', 'thumbnail', 'description', 'rera_number', 'qr_code', 'location', 'company_branch', 'type', 'status', 'units', 'bedrooms', 'area_from', 'area_to', 'iframe', 'meta_title', 'meta_description', 'slug','amenities']
 
-        
+class ProjectDropDownListSerializer(serializers.ModelSerializer):
+    class Meta:  
+        model = Project
+        fields = ['id','name']
+
 class ProjectImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectImages
@@ -74,3 +78,30 @@ class RentalsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rentals
         fields = ['id','name','image','company_branch','type','area','price','is_hide']
+
+
+class EnquirySerializer(serializers.ModelSerializer):
+    project = ProjectDropDownListSerializer()
+    enquiry_date = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Enquiry
+        fields = ['id', 'name', 'email', 'project', 'phone', 'message', 'is_read', 'enquiry_date',]
+
+    def get_enquiry_date(self, obj):  
+        return obj.enquiry_date.strftime("%Y-%m-%d %H:%M") 
+    
+
+class EnquiryDownloadSerializer(serializers.ModelSerializer):
+    project = serializers.SerializerMethodField()
+    enquiry_date = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Enquiry
+        fields = ['name', 'email','phone','message', 'project','enquiry_date' ]
+
+    def get_enquiry_date(self, obj):  
+        return obj.enquiry_date.strftime("%Y-%m-%d %H:%M") 
+    
+    def get_project(self, obj):  
+        return obj.project.name

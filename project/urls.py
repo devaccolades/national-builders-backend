@@ -14,6 +14,7 @@ urlpatterns = [
     path('project-images-get/<uuid:projectId>/', ProjectImagesApiView.as_view(), name='project-image-get'),
     path('project-images-update/<uuid:id>/', ProjectImagesApiView.as_view(), name='project-image-update'),
     path('project-images-delete/<uuid:id>/', ProjectImagesApiView.as_view(), name='project-image-get'),
+    path('project-count-get/', ProjectCountAPIView.as_view(), name='project-count-get'),
 
     path('floor-plan-images-add/', FloorPlanImagesApiView.as_view(), name='floor-plan-image-add'),
     path('floor-plan-images-get/<uuid:projectId>/', FloorPlanImagesApiView.as_view(), name='floor-plan-image-get'),
@@ -35,6 +36,14 @@ urlpatterns = [
     
     path('rental/', RentalsAPIView.as_view(), name='rental-add-get'),
     path('rental/<uuid:id>/', RentalsAPIView.as_view(), name='rental-update-delete'),
+    path('rental-is-hide/<uuid:id>/', RentalsUpdateAPIView.as_view(), name='rentals-hide-show-update-delete'),
+   
+    path('project-dropdown-list/', ProjectDropDownList.as_view(), name='project-dropdown-list'),
+    
+    path('enquiry-list/', EnquiryAPIView.as_view(), name='enquiry-list'),
+    path('enquiry/<int:id>/', EnquiryAPIView.as_view(), name='enquiry-list'),
+  
+    path('enquiry-download/', EnquiryDownloadAPIView.as_view(), name='enquiry-download'),
 
     
 
