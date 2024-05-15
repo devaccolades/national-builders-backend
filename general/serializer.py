@@ -19,15 +19,15 @@ class KeyHandoverSeralizer(serializers.ModelSerializer):
         model = KeyHandOver
         fields = ['id', 'image','name']
 
-class TestimoniealsSaveSeralizer(serializers.ModelSerializer):
+class TestimonialsSaveSeralizer(serializers.ModelSerializer):
     class Meta:
-        model = Testimonieals
+        model = Testimonials
         fields = ['id','image','name','project','description']
 
-class TestimoniealsSeralizer(serializers.ModelSerializer):
+class TestimonialsSeralizer(serializers.ModelSerializer):
     project = serializers.SerializerMethodField()
     class Meta:
-        model = Testimonieals
+        model = Testimonials
         fields = ['id', 'image','name','project','description']
 
     def get_project(self, obj):
@@ -36,9 +36,13 @@ class TestimoniealsSeralizer(serializers.ModelSerializer):
         return serializer.data
     
 class BlogsSeralizer(serializers.ModelSerializer):
+    date_added = serializers.SerializerMethodField()
     class Meta:
         model = Blogs
-        fields = ['id','image','title','body','image_alt','meta_tag','meta_description','slug']
+        fields = ['id','image','title','body','image_alt','meta_tag','meta_description','slug','date_added']
+
+    def get_date_added(self, obj):  
+        return obj.date_added.strftime("%B %d, %Y") if obj.date_added else None
 
 class NewsAndEventsSeralizer(serializers.ModelSerializer):
     class Meta:
@@ -49,3 +53,19 @@ class SeoSeralizer(serializers.ModelSerializer):
     class Meta:
         model = SEO
         fields = ['id','page','path','meta_title','meta_description']
+
+class ProjectCountsSeralizer(serializers.ModelSerializer):
+    class Meta:
+        model = ProjectCounts
+        fields = ['id','launched','projectcompleted','readytooccupy','ongoing']
+
+class AwardsImagesSeralizer(serializers.ModelSerializer):
+    class Meta:
+        model = AwardsImages
+        fields = ['id','images','order']
+
+
+class HomePageVideoImagesSeralizer(serializers.ModelSerializer):
+    class Meta:
+        model = HomePageVideos
+        fields = ['id','desktop_video','mobile_video']

@@ -757,6 +757,7 @@ class EnquiryAPIView(APIView):
             }
             return Response(response_data, status=status.HTTP_200_OK)
         
+        
 class EnquiryDownloadAPIView(APIView):
     # permission_classes = (IsAdminUser,)
     def get(self, request):
@@ -771,12 +772,101 @@ class EnquiryDownloadAPIView(APIView):
             writer = csv.writer(response)
             writer.writerow(['Name', 'Email', 'Phone', 'Message','Project Name','Enquiry_date'])
             for enquiry in serializer.data:
-                writer.writerow(list(enquiry.values()))
+                name = enquiry.get('name', '')
+                email = enquiry.get('email', '')
+                phone = enquiry.get('phone', '')
+                message = enquiry.get('message', '')
+                project_name = enquiry.get('project', '')
+                enquiry_date = enquiry.get('enquiry_date', '')
+
+                writer.writerow([name, email, phone, message, project_name, enquiry_date])
+
             return response
-        except:
+        except Exception as e:
+            print(e)
             response_data={
                 "StatusCode":6002,
                 "detail" : "error",
-                 "message": str(e)
+                 "message": "Something went wrong"
+            }
+            return Response(response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class RentalEnquiryAPIView(APIView):
+    permission_classes = (IsAdminUser,)
+    
+    def get(self, request):
+        instance = RentalEnquiry.objects.filter(is_deleted=False)
+        serializer = RentalEnquirySerializer(instance, many=True)
+        response_data = {
+            "StatusCode": 6000,
+            "detail": "Success",
+            "data": serializer.data,
+            "message" : "Success"
+        }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def patch(self, request, id):
+        instance = self.get_object(id)
+        serializer = RentalEnquirySerializer(instance, data=request.data,partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+                "StatusCode":6000,
+                "detail" : "Success",
+                "data": serializer.data,
+                "message": 'Rentals Enqury Read !'
+            }
+        else:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "data": serializer.errors
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def get_object(self, id):
+        try:
+            return RentalEnquiry.objects.filter(id=id,is_deleted=False).first()
+        except RentalEnquiry.DoesNotExist:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "message": "id Not Found"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+
+
+class RentalsEnquiryDownloadAPIView(APIView):
+    # permission_classes = (IsAdminUser,)
+    def get(self, request):
+        try:
+            instance = RentalEnquiry.objects.filter(is_deleted=False)
+            serializer = RentalEnquiryDownloadSerializer(instance,many=True)
+            response = HttpResponse(
+            content_type='text/csv',
+            )
+            response['Content-Disposition'] = 'attachment; filename="RentalsEnquiryData.csv"'
+
+            writer = csv.writer(response)
+            writer.writerow(['Name', 'Email', 'Phone', 'Message','Rentals Name','Enquiry_date'])
+            for enquiry in serializer.data:
+                name = enquiry.get('name', '')
+                email = enquiry.get('email', '')
+                phone = enquiry.get('phone', '')
+                message = enquiry.get('message', '')
+                rentals_name = enquiry.get('rentals', '')
+                enquiry_date = enquiry.get('enquiry_date', '')
+
+                writer.writerow([name, email, phone, message, rentals_name, enquiry_date])
+
+            return response
+        except Exception as e:
+            print(e)
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                 "message": "Something went wrong"
             }
             return Response(response_data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

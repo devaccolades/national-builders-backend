@@ -104,4 +104,37 @@ class EnquiryDownloadSerializer(serializers.ModelSerializer):
         return obj.enquiry_date.strftime("%Y-%m-%d %H:%M") 
     
     def get_project(self, obj):  
-        return obj.project.name
+        if obj.project:
+            return obj.project.name
+        else:
+            return ''
+
+    
+class RentalEnquirySerializer(serializers.ModelSerializer):
+    rentals = ProjectDropDownListSerializer()
+    enquiry_date = serializers.SerializerMethodField()
+
+    class Meta:
+        model = RentalEnquiry
+        fields = ['id', 'name', 'email', 'rentals', 'phone', 'message', 'is_read', 'enquiry_date',]
+
+    def get_enquiry_date(self, obj):  
+        return obj.enquiry_date.strftime("%Y-%m-%d %H:%M") 
+    
+
+class RentalEnquiryDownloadSerializer(serializers.ModelSerializer):
+    rentals = serializers.SerializerMethodField()
+    enquiry_date = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Enquiry
+        fields = ['name', 'email','phone','message', 'rentals','enquiry_date' ]
+
+    def get_enquiry_date(self, obj):  
+        return obj.enquiry_date.strftime("%Y-%m-%d %H:%M") 
+    
+    def get_rentals(self, obj):  
+        if obj.rentals:
+            return obj.rentals.name
+        else:
+            return ''

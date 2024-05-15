@@ -109,6 +109,23 @@ class ProjectDistance(BaseModel):
         ordering = ('date_added',)
 
 
+class Rentals(BaseModel):
+    name = models.CharField(max_length=255, unique=True)
+    image = models.ImageField(upload_to='rentals/image', null=True, blank=True)
+    company_branch = models.ForeignKey(CompanyBranch, on_delete=models.SET_NULL, null=True)
+    type = models.CharField(choices=PROJECT_TYPE_CHOICES, max_length=255)
+    area = models.CharField(max_length=255,blank=True,null=True)
+    price = models.CharField(max_length=255,blank=True,null=True)
+    is_hide = models.BooleanField(default=False)
+
+    class Meta:
+        db_table='Rentals'
+        verbose_name = ('Rentals')
+        verbose_name_plural = ('Rentals')
+        ordering = ('-date_added',)
+
+    def __str__(self):
+        return str(self.name)
 
 class Enquiry(models.Model):
     project=models.ForeignKey(Project,on_delete=models.CASCADE,null=True,blank=True)
@@ -128,21 +145,23 @@ class Enquiry(models.Model):
     
     def __str__(self):
         return str(self.enquiry_date)
-
-class Rentals(BaseModel):
-    name = models.CharField(max_length=255, unique=True)
-    image = models.ImageField(upload_to='rentals/image', null=True, blank=True)
-    company_branch = models.ForeignKey(CompanyBranch, on_delete=models.SET_NULL, null=True)
-    type = models.CharField(choices=PROJECT_TYPE_CHOICES, max_length=255)
-    area = models.CharField(max_length=255,blank=True,null=True)
-    price = models.CharField(max_length=255,blank=True,null=True)
-    is_hide = models.BooleanField(default=False)
-
+    
+class RentalEnquiry(models.Model):
+    rentals=models.ForeignKey(Rentals,on_delete=models.CASCADE,null=True,blank=True)
+    enquiry_date=models.DateTimeField(auto_now_add=True)
+    name=models.CharField(max_length=200,blank=True,null=True)
+    email=models.CharField(max_length=200,blank=True,null=True)
+    phone=models.BigIntegerField(blank=True,null=True)
+    message=models.TextField(blank=True,null=True)
+    is_read=models.BooleanField(default=False)
+    is_deleted=models.BooleanField(default=False)
     class Meta:
-        db_table='Rentals'
-        verbose_name = ('Rentals')
-        verbose_name_plural = ('Rentals')
-        ordering = ('-date_added',)
+        db_table='RentalEnquiry'
+        verbose_name = ('Rental Enquiry')
+        verbose_name_plural = ('Rental Enquirys')
+        ordering = ('-enquiry_date',)
 
+    
     def __str__(self):
-        return str(self.name)
+        return str(self.enquiry_date)
+

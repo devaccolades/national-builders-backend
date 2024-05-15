@@ -10,8 +10,8 @@ urlpatterns = [
     path('key-handover/', KeyHandOverAPIView.as_view(), name='key-handdover-get-add'),
     path('key-handover/<uuid:id>/', KeyHandOverAPIView.as_view(), name='key-handdover-update-delete'),
     
-    path('testimonieals/', TestimoniealsAPIView.as_view(), name='testimonieals-get-add'),
-    path('testimonieals/<uuid:id>/', TestimoniealsAPIView.as_view(), name='testimonieals-update-delete'),
+    path('Testimonials/', TestimonialsAPIView.as_view(), name='Testimonials-get-add'),
+    path('Testimonials/<uuid:id>/', TestimonialsAPIView.as_view(), name='Testimonials-update-delete'),
     
     path('blogs/', BlogsAPIView.as_view(), name='blogs-get-add'),
     path('blogs/<uuid:id>/', BlogsAPIView.as_view(), name='blogs-update-delet'),
@@ -21,6 +21,16 @@ urlpatterns = [
     
     path('seo/', SeoAPIView.as_view(), name='seo-get-post'),
     path('seo/<uuid:id>/', SeoAPIView.as_view(), name='seo-update-delete'),
+    
+    path('project-count-homepage/', ProjectCoutsAPIView.as_view(), name='projectcouts-get'),
+    path('project-count-homepage/<int:id>/', ProjectCoutsAPIView.as_view(), name='projectcouts-update'),
+   
+    path('awards/', AwardsAPIView.as_view(), name='awards-get'),
+    path('awards/<uuid:id>/', AwardsAPIView.as_view(), name='awards-get'),
+    
+    path('home-page-videos/', HomePageVideoAPIView.as_view(), name='awards-get'),
+    path('home-page-videos/<int:id>/', HomePageVideoAPIView.as_view(), name='awards-update'),
+
 
 
 ]

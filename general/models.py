@@ -3,7 +3,7 @@ import uuid
 from ckeditor.fields import RichTextField
 # Create your models here.
 
-class BaseModel(models.Model):
+class   BaseModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     date_added = models.DateTimeField(db_index=True,auto_now_add=True)
     date_updated = models.DateTimeField(auto_now_add=True)
@@ -47,16 +47,16 @@ class KeyHandOver(BaseModel):
         return self.name
         
     
-class Testimonieals(BaseModel):
+class Testimonials(BaseModel):
     name = models.CharField(max_length=255,null=True,blank=True)
-    image = models.ImageField(upload_to='testimonieals/image', null=True, blank=True)
+    image = models.ImageField(upload_to='testimonials/image', null=True, blank=True)
     project=models.ForeignKey('project.Project',on_delete=models.CASCADE,null=True,blank=True)
     description = models.TextField(null=True, blank=True)
 
     class Meta:
-        db_table = 'testimonieals'
-        verbose_name = ('Testimonieal')
-        verbose_name_plural = ('Testimoniealss')
+        db_table = 'Testimonials'
+        verbose_name = ('Testimonials')
+        verbose_name_plural = ('Testimonials')
         ordering = ('-date_added',)
 
     def __str__(self):
@@ -110,3 +110,37 @@ class SEO(BaseModel):
         verbose_name = ('SEO')
         verbose_name_plural = ('SEO')
         ordering = ('date_added',)
+
+
+class ProjectCounts(models.Model):
+    launched=models.CharField(max_length=200,blank=True,null=True)
+    projectcompleted=models.CharField(max_length=200,blank=True,null=True)
+    readytooccupy=models.CharField(max_length=200,blank=True,null=True)
+    ongoing=models.CharField(max_length=200,blank=True,null=True)
+   
+    class Meta:
+        db_table='projectcounts'
+        verbose_name = ('Project Count')
+        verbose_name_plural = ('Project Counts')
+        ordering = ('id',)
+
+
+class AwardsImages(BaseModel):
+    images = models.ImageField(upload_to='awards/image', null=True, blank=True)
+    order = models.IntegerField(blank=True,null=True,default=1)
+    class Meta:
+        db_table = 'awardsimages'
+        verbose_name = ('Awards Image')
+        verbose_name_plural = ('Awards Images')
+        ordering = ('date_added',)
+
+
+class HomePageVideos(models.Model):
+    desktop_video=models.FileField(upload_to='homepage/videos', null=True, blank=True)
+    mobile_video=models.FileField(upload_to='homepage/videos', null=True, blank=True)
+   
+    class Meta:
+        db_table='homepagevideos'
+        verbose_name = ('Home Page Video')
+        verbose_name_plural = ('Home Page Videos')
+        ordering = ('id',)
