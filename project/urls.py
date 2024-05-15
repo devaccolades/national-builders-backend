@@ -41,9 +41,13 @@ urlpatterns = [
     path('project-dropdown-list/', ProjectDropDownList.as_view(), name='project-dropdown-list'),
     
     path('enquiry-list/', EnquiryAPIView.as_view(), name='enquiry-list'),
-    path('enquiry/<int:id>/', EnquiryAPIView.as_view(), name='enquiry-list'),
+    path('enquiry/<int:id>/', EnquiryAPIView.as_view(), name='enquiry-update'),
+  
+    path('rentals-enquiry/', RentalEnquiryAPIView.as_view(), name='rental-enquiry-list'),
+    path('rentals-enquiry/<int:id>/', RentalEnquiryAPIView.as_view(), name='rental-update'),
   
     path('enquiry-download/', EnquiryDownloadAPIView.as_view(), name='enquiry-download'),
+    path('rentals-enquiry-download/', RentalsEnquiryDownloadAPIView.as_view(), name='enquiry-download'),
 
     
 

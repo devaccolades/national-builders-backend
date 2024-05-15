@@ -209,10 +209,10 @@ class KeyHandOverAPIView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
         
 
-class TestimoniealsAPIView(APIView):
+class TestimonialsAPIView(APIView):
     permission_classes = (IsAdminUser,)
     def post(self, request):
-        serializer = TestimoniealsSaveSeralizer(data=request.data)
+        serializer = TestimonialsSaveSeralizer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             response_data={
@@ -233,8 +233,8 @@ class TestimoniealsAPIView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
            
     def get(self, request):
-        instance = Testimonieals.objects.filter(is_deleted=False)
-        serializer = TestimoniealsSeralizer(instance, many=True, context={'request': request})
+        instance = Testimonials.objects.filter(is_deleted=False)
+        serializer = TestimonialsSeralizer(instance, many=True, context={'request': request})
         response_data={
             "StatusCode":6000,
             "detail" : "Success",
@@ -247,7 +247,7 @@ class TestimoniealsAPIView(APIView):
         data = request.data.copy()        
         if 'image' not in data or data['image'] == "":
             data['image'] = instance.image
-        serializer = TestimoniealsSaveSeralizer(instance, data=data)
+        serializer = TestimonialsSaveSeralizer(instance, data=data)
         
         if serializer.is_valid():
             serializer.save()
@@ -278,8 +278,8 @@ class TestimoniealsAPIView(APIView):
     
     def get_object(self, id):
         try:
-            return Testimonieals.objects.filter(id=id,is_deleted=False).first()
-        except Testimonieals.DoesNotExist:
+            return Testimonials.objects.filter(id=id,is_deleted=False).first()
+        except Testimonials.DoesNotExist:
             response_data={
                 "StatusCode":6002,
                 "detail" : "error",
@@ -516,6 +516,214 @@ class SeoAPIView(APIView):
         try:
             return SEO.objects.filter(id=id,is_deleted=False).first()
         except SEO.DoesNotExist:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "message": "id Not Found"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+class ProjectCoutsAPIView(APIView):
+    permission_classes = (IsAdminUser,)
+    def post(self, request):
+        serializer = ProjectCountsSeralizer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+            "StatusCode":6001,
+            "detail" : "Success",
+            "data": serializer.data,
+            "message" : "Project Cuont added Added !"
+            }
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        else:
+            response_data={
+            "StatusCode":6002,
+            "detail" : "error",
+            "data": serializer.errors,
+            "message" : "error"
+
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+    def get(self, request):
+        instance = ProjectCounts.objects.all()
+        serializer = ProjectCountsSeralizer(instance, many=True)
+        response_data={
+            "StatusCode":6000,
+            "detail" : "Success",
+            "data": serializer.data
+            }
+        return Response(response_data,status=status.HTTP_200_OK)
+    
+    def patch(self, request, id):
+        instance = self.get_object(id)
+        serializer = ProjectCountsSeralizer(instance, data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+                "StatusCode":6000,
+                "detail" : "Success",
+                "data": serializer.data,
+                "message" : "Project Count's Updated !"
+            }
+        else:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "data": serializer.errors
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def get_object(self, id):
+        try:
+            return ProjectCounts.objects.filter(id=id).first()
+        except ProjectCounts.DoesNotExist:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "message": "id Not Found"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+
+class AwardsAPIView(APIView):
+    permission_classes = (IsAdminUser,)
+    def post(self, request):
+        serializer = AwardsImagesSeralizer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+            "StatusCode":6001,
+            "detail" : "Success",
+            "data": serializer.data,
+            "message" : "Image Added !"
+            }
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        else:
+            response_data={
+            "StatusCode":6002,
+            "detail" : "error",
+            "data": serializer.errors,
+            "message" : "error"
+
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+    def get(self, request):
+        instance = AwardsImages.objects.filter(is_deleted=False)
+        serializer = AwardsImagesSeralizer(instance, many=True,context={'request': request})
+        response_data={
+            "StatusCode":6000,
+            "detail" : "Success",
+            "data": serializer.data
+            }
+        return Response(response_data,status=status.HTTP_200_OK)
+    
+    def patch(self, request, id):
+        instance = self.get_object(id)
+        serializer = AwardsImagesSeralizer(instance, data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+                "StatusCode":6000,
+                "detail" : "Success",
+                "data": serializer.data,
+                "message" : "Image Updated !"
+            }
+        else:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "data": serializer.errors
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def delete(self, request, id):
+        instance = self.get_object(id)
+        instance.is_deleted = True 
+        instance.save()
+        response_data={
+                "StatusCode":6000,
+                "detail" : "error",
+                "data" : "",
+                "message": "image Deleted"
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def get_object(self, id):
+        try:
+            return AwardsImages.objects.filter(id=id).first()
+        except AwardsImages.DoesNotExist:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "message": "id Not Found"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        
+
+class HomePageVideoAPIView(APIView):
+    permission_classes = (IsAdminUser,)
+    def post(self, request):
+        serializer = HomePageVideoImagesSeralizer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+            "StatusCode":6001,
+            "detail" : "Success",
+            "data": serializer.data,
+            "message" : "Video Added !"
+            }
+            return Response(response_data, status=status.HTTP_201_CREATED)
+        else:
+            response_data={
+            "StatusCode":6002,
+            "detail" : "error",
+            "data": serializer.errors,
+            "message" : "error"
+
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+    def get(self, request):
+        instance = HomePageVideos.objects.all()
+        serializer = HomePageVideoImagesSeralizer(instance, many=True,context={'request': request})
+        response_data={
+            "StatusCode":6000,
+            "detail" : "Success",
+            "data": serializer.data
+            }
+        return Response(response_data,status=status.HTTP_200_OK)
+    
+    def patch(self, request, id):
+        instance = self.get_object(id)
+        # data = request.data.copy()        
+        # if 'desktop_video' not in data or data['desktop_video'] == "":
+        #     data['desktop_video'] = instance.desktop_video
+        # if 'desktop_video' not in data or data['desktop_video'] == "":
+        #     data['desktop_video'] = instance.desktop_video
+        serializer = HomePageVideoImagesSeralizer(instance, data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            response_data={
+                "StatusCode":6000,
+                "detail" : "Success",
+                "data": serializer.data,
+                "message" : "Video Updated !"
+            }
+        else:
+            response_data={
+                "StatusCode":6002,
+                "detail" : "error",
+                "data": serializer.errors
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+    
+    def get_object(self, id):
+        try:
+            return HomePageVideos.objects.filter(id=id).first()
+        except HomePageVideos.DoesNotExist:
             response_data={
                 "StatusCode":6002,
                 "detail" : "error",

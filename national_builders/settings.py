@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'accounts',
     'general',
     'project',
+    'client',
 
     'rest_framework',
     'corsheaders',
