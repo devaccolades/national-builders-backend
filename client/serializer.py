@@ -1,17 +1,32 @@
 from rest_framework import serializers
 
-from project import serializer as project_serializer
-from general import serializer as general_serializer
+from project import models as project_models
+from general import models as general_models
 
 class TestimonialsSeralizer(serializers.ModelSerializer):
-    project = project_serializer.ProjectDropDownListSerializer()
+    project = serializers.SerializerMethodField()
     class Meta:
-        model = general_serializer.Testimonials
+        model = general_models.Testimonials
         fields = ['id', 'image','name','project','description']
 
     def get_project(self, obj):
-        from project.serializer import ProjectListSerializer 
-        serializer = ProjectListSerializer(obj.project)
-        return serializer.data
+        return obj.project.name
+
+class CompanyBranchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = general_models.CompanyBranch
+        fields = ['id','location'] 
+
+class ProjectSerializer(serializers.ModelSerializer):
+    company_branch = CompanyBranchSerializer()
+    class Meta:  
+        model = project_models.Project
+        fields = ['id','name', 'thumbnail', 'description', 'rera_number', 'qr_code', 'location', 'company_branch', 'type', 'status', 'units', 'bedrooms', 'area_from', 'area_to', 'iframe', 'meta_title', 'meta_description', 'slug']
+
+    def clean_amenities(self):
+        amenities = self.cleaned_data.get('amenities')
+        if not amenities: 
+            return []
+        return amenities
     
-    # 
+
