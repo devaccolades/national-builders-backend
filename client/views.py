@@ -9,6 +9,8 @@ from project import models as project_models
 from project import serializer as project_serializer
 from . import serializer as client_serialzer
 
+from general.views import CompanyBranchDropdownListView
+
 class DataAPIView(APIView):
     def get_project_counts(self):
         try:
@@ -20,7 +22,7 @@ class DataAPIView(APIView):
 
     def get_awards(self):
         try:
-            instances = general_model.AwardsImages.objects.all()
+            instances = general_model.AwardsImages.objects.filter(is_deleted=False)
             serializer = general_serializer.AwardsImagesSeralizer(instances, many=True, context={'request': self.request})
             return serializer.data, None
         except Exception as e:
@@ -33,11 +35,29 @@ class DataAPIView(APIView):
             return serializer.data, None
         except Exception as e:
             return None, f"Failed to fetch Home Page videos Data: {str(e)}"
+        
+    def get_home_page_blogs(self):
+        try:
+            instances = general_model.Blogs.objects.filter(is_deleted=False)[:6]
+            serializer = general_serializer.BlogsSeralizer(instances, many=True, context={'request': self.request})
+            return serializer.data, None
+        except Exception as e:
+            return None, f"Failed to fetch Home Page videos Data: {str(e)}"
+        
+    def get_home_page_testimonials(self):
+        try:
+            instances = general_model.Testimonials.objects.filter(is_deleted=False)[:6]
+            serializer = client_serialzer.TestimonialsSeralizer(instances, many=True, context={'request': self.request})
+            return serializer.data, None
+        except Exception as e:
+            return None, f"Failed to fetch Home Page videos Data: {str(e)}"
 
     def get(self, request):
         project_counts_data, project_counts_error = self.get_project_counts()
         awards_data, awards_error = self.get_awards()
         home_page_videos_data, home_page_videos_error = self.get_home_page_videos()
+        home_page_blogs_data, home_page_blogs_error = self.get_home_page_blogs()
+        home_page_testimonials_data, home_page_testimonials_error = self.get_home_page_testimonials()
 
         response_data = {}
 
@@ -56,75 +76,132 @@ class DataAPIView(APIView):
         else:
             response_data['home_page_videos_error'] = home_page_videos_error
 
+        if home_page_blogs_data is not None:
+            response_data['blogs'] = home_page_blogs_data
+        else:
+            response_data['blogs_error'] = home_page_blogs_error
+
+        if home_page_testimonials_data is not None:
+            response_data['testimonials'] = home_page_testimonials_data
+        else:
+            response_data['testimonials_error'] = home_page_testimonials_error
+
         response={
-        "StatusCode":6000 if all(data is not None for data in [project_counts_data, awards_data, home_page_videos_data]) else 6002,
+        "StatusCode":6000 if all(data is not None for data in [project_counts_data, awards_data, home_page_videos_data,home_page_blogs_data]) else 6002,
         "detail" : "Success",
         "data": response_data,
         "message" : "feching datas !"
         }
         return Response(response, status=status.HTTP_200_OK)
 
-class TestimonialsAPIView(APIView):
-    def get (self,request):
-        try:
-            instances = general_model.Testimonials.objects.all()
-            serializer = client_serialzer.TestimonialsSeralizer(instances, many=True,context={'request': self.request})
-            response_data = {
-                "StatusCode": 6000,
-                "detail": "Success",
-                "data": serializer.data,
-                "message": "Testimonials Data fetched successfully"
-            }
-            return Response(response_data, status=status.HTTP_200_OK)
-        except Exception as e:
-            response_data = {
-                "StatusCode": 6002,
-                "detail": "error",
-                "data" : "",
-                "message": f"Failed to fetch Testimonials Data: {str(e)}"
-            }
-            return Response(response_data, status=status.HTTP_200_OK)
-
-
-class BlogsAPIView(APIView):
-    def get (self,request):
-        try:
-            instances = general_model.Blogs.objects.all()
-            serializer = general_serializer.BlogsSeralizer(instances, many=True,context={'request': self.request})
-            response_data = {
-                "StatusCode": 6000,
-                "detail": "Success",
-                "data": serializer.data,
-                "message": "Blogs Data fetched successfully"
-            }
-            return Response(response_data, status=status.HTTP_200_OK)
-        except Exception as e:
-            response_data = {
-                "StatusCode": 6002,
-                "detail": "error",
-                "data" : "",
-                "message": f"Failed to fetch Blogs Data: {str(e)}"
-            }
-            return Response(response_data, status=status.HTTP_200_OK)
-
 
 class ProjectsAPIView(APIView):
-    def get (self,request):
+    def get(self, request, slug=None):
+        """
+        Get project data by slug or return all projects.
+        """
+        response_data = {}
         try:
-            instances = project_models.Project.objects.all()
-            serializer = project_serializer.ProjectSerializer(instances, many=True,context={'request': self.request})
-            response_data = {
-                "StatusCode": 6000,
-                "detail": "Success",
-                "data": serializer.data,
-                "message": "Project's Data fetched successfully"
-            }
+            if slug:
+                instance = project_models.Project.objects.filter(slug=slug, is_deleted=False).first()
+            else:
+                instance = project_models.Project.objects.filter(is_deleted=False)
+
+            if not instance:
+                response_data = {
+                "StatusCode": 6002,
+                "detail": "success",
+                "data":"",
+                "message": "id not found"
+                }
+                return Response(response_data,status=status.HTTP_200_OK)
+            serializer = client_serialzer.ProjectSerializer(instance, many=not slug, context={'request': self.request})
+            if slug:
+                image_instance = project_models.ProjectImages.objects.filter(project=instance.id, is_deleted=False)
+                image_serializer = project_serializer.ProjectImageSerializer(image_instance, many=True, context={'request': self.request})
+                floor_instance = project_models.FloorPlanImages.objects.filter(project=instance.id, is_deleted=False)
+                floor_serializer = project_serializer.FloorPlanSerializer(floor_instance, many=True, context={'request': self.request})
+                amenities_instance = instance.amenities.all()
+                amenities_serializer = project_serializer.AmenitiesSerializer(amenities_instance, many=True, context={'request': self.request})
+                specification_instance = project_models.ProjectSpecification.objects.filter(project=instance.id, is_deleted=False)
+                specification_serializer = project_serializer.SpecificationsSerializer(specification_instance, many=True)
+                distance_instance = project_models.ProjectDistance.objects.filter(project=instance.id, is_deleted=False)
+                distance_serializer = project_serializer.DistanceSerializer(distance_instance, many=True)
+                response_data={
+                    "StatusCode": 6000,
+                    "detail": "success",
+                    "data": serializer.data,
+                    "images": image_serializer.data,
+                    "floor_images": floor_serializer.data,
+                    "amenities": amenities_serializer.data,
+                    "specification": specification_serializer.data,
+                    "distance": distance_serializer.data,
+                    "message": "Project's Data fetched successfully"
+
+                }
+            else:
+                response_data = {
+                    "StatusCode": 6000,
+                    "detail": "success",
+                    "data": serializer.data,
+                    "message": "Project's Data fetched successfully"
+                }
+
             return Response(response_data, status=status.HTTP_200_OK)
+
         except Exception as e:
             response_data = {
                 "StatusCode": 6002,
                 "detail": "error",
-                "data" : "",
-                "message": f"Failed to fetch Project's Data: {str(e)}"
+                "data":"",
+                "message": f'Something went wrong {e}'
             }
-            return Response(response_data, status=status.HTTP_200_OK)
+            return Response(response_data,status=status.HTTP_200_OK)
+
+class BranchDropDownAPIView(CompanyBranchDropdownListView):
+    pass
+
+# class TestimonialsAPIView(APIView):
+#     def get (self,request):
+#         try:
+#             instances = general_model.Testimonials.objects.all()
+#             serializer = client_serialzer.TestimonialsSeralizer(instances, many=True,context={'request': self.request})
+#             response_data = {
+#                 "StatusCode": 6000,
+#                 "detail": "Success",
+#                 "data": serializer.data,
+#                 "message": "Testimonials Data fetched successfully"
+#             }
+#             return Response(response_data, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             response_data = {
+#                 "StatusCode": 6002,
+#                 "detail": "error",
+#                 "data" : "",
+#                 "message": f"Failed to fetch Testimonials Data: {str(e)}"
+#             }
+#             return Response(response_data, status=status.HTTP_200_OK)
+
+
+# class BlogsAPIView(APIView):
+#     def get (self,request):
+#         try:
+#             instances = general_model.Blogs.objects.all()
+#             serializer = general_serializer.BlogsSeralizer(instances, many=True,context={'request': self.request})
+#             response_data = {
+#                 "StatusCode": 6000,
+#                 "detail": "Success",
+#                 "data": serializer.data,
+#                 "message": "Blogs Data fetched successfully"
+#             }
+#             return Response(response_data, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             response_data = {
+#                 "StatusCode": 6002,
+#                 "detail": "error",
+#                 "data" : "",
+#                 "message": f"Failed to fetch Blogs Data: {str(e)}"
+#             }
+#             return Response(response_data, status=status.HTTP_200_OK)
+
+
