@@ -130,7 +130,8 @@ class Rentals(BaseModel):
 class Enquiry(models.Model):
     project=models.ForeignKey(Project,on_delete=models.CASCADE,null=True,blank=True)
     enquiry_date=models.DateTimeField(auto_now_add=True)
-    name=models.CharField(max_length=200,blank=True,null=True)
+    first_name=models.CharField(max_length=200,blank=True,null=True)
+    last_name=models.CharField(max_length=200,blank=True,null=True)
     email=models.CharField(max_length=200,blank=True,null=True)
     phone=models.BigIntegerField(blank=True,null=True)
     message=models.TextField(blank=True,null=True)
@@ -149,7 +150,8 @@ class Enquiry(models.Model):
 class RentalEnquiry(models.Model):
     rentals=models.ForeignKey(Rentals,on_delete=models.CASCADE,null=True,blank=True)
     enquiry_date=models.DateTimeField(auto_now_add=True)
-    name=models.CharField(max_length=200,blank=True,null=True)
+    first_name=models.CharField(max_length=200,blank=True,null=True)
+    last_name=models.CharField(max_length=200,blank=True,null=True)
     email=models.CharField(max_length=200,blank=True,null=True)
     phone=models.BigIntegerField(blank=True,null=True)
     message=models.TextField(blank=True,null=True)
