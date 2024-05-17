@@ -161,47 +161,147 @@ class ProjectsAPIView(APIView):
 class BranchDropDownAPIView(CompanyBranchDropdownListView):
     pass
 
-# class TestimonialsAPIView(APIView):
-#     def get (self,request):
-#         try:
-#             instances = general_model.Testimonials.objects.all()
-#             serializer = client_serialzer.TestimonialsSeralizer(instances, many=True,context={'request': self.request})
-#             response_data = {
-#                 "StatusCode": 6000,
-#                 "detail": "Success",
-#                 "data": serializer.data,
-#                 "message": "Testimonials Data fetched successfully"
-#             }
-#             return Response(response_data, status=status.HTTP_200_OK)
-#         except Exception as e:
-#             response_data = {
-#                 "StatusCode": 6002,
-#                 "detail": "error",
-#                 "data" : "",
-#                 "message": f"Failed to fetch Testimonials Data: {str(e)}"
-#             }
-#             return Response(response_data, status=status.HTTP_200_OK)
+class RentalsAPIView(APIView):
+    def get(self, request):
+        try:
+            instance = project_models.Rentals.objects.filter(is_deleted=False,is_hide=False)
+            serializer = project_serializer.RentalsSerializer(instance, many=True, context={'request': self.request})
+            response_data = {
+                    "StatusCode": 6000,
+                    "detail": "success",
+                    "data": serializer.data,
+                    "message": "Rental's Data fetched successfully"
+                }
+
+        except Exception as e:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "error",
+                "data":"",
+                "message": f'Something went wrong {e}'
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+        
+class RentalsEnquiryAPIView(APIView):
+     def post(self, request):
+        try:
+            serializer = client_serialzer.RentalEnquirySerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                response_data = {
+                    "StatusCode": 6001,
+                    "detail": "success",
+                    "data": serializer.data,
+                    "message": "Rental Enquiry successfully"
+                }
+            else:
+                response_data = {
+                    "StatusCode": 6002,
+                    "detail": "validation error",
+                    "data": serializer.errors,
+                    "message": "Invalid data"
+                }
+        except Exception as e:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "error",
+                "data":"",
+                "message": f'Something went wrong {e}'
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+
+from rest_framework.pagination import PageNumberPagination
+
+class TestimonialsAPIView(APIView):
+    def get (self,request):
+       
+        try:
+            start_limit = int(request.query_params.get('start_limit',0))
+            end_limit = int(request.query_params.get('end_limit',3))
+            instances = general_model.Testimonials.objects.filter(is_deleted=False)[start_limit:end_limit]
+            total_count = general_model.Testimonials.objects.filter(is_deleted=False).count()
+            serializer = client_serialzer.TestimonialsSeralizer(instances, many=True,context={'request': self.request})
+            response_data = {
+                "StatusCode": 6000,
+                "detail": "Success",
+                "data": serializer.data,
+                "total_count" : total_count,
+                "message": "Testimonials Data fetched successfully"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "error",
+                "data" : "",
+                "message": f"Failed to fetch Testimonials Data: {str(e)}"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
 
 
-# class BlogsAPIView(APIView):
-#     def get (self,request):
-#         try:
-#             instances = general_model.Blogs.objects.all()
-#             serializer = general_serializer.BlogsSeralizer(instances, many=True,context={'request': self.request})
-#             response_data = {
-#                 "StatusCode": 6000,
-#                 "detail": "Success",
-#                 "data": serializer.data,
-#                 "message": "Blogs Data fetched successfully"
-#             }
-#             return Response(response_data, status=status.HTTP_200_OK)
-#         except Exception as e:
-#             response_data = {
-#                 "StatusCode": 6002,
-#                 "detail": "error",
-#                 "data" : "",
-#                 "message": f"Failed to fetch Blogs Data: {str(e)}"
-#             }
-#             return Response(response_data, status=status.HTTP_200_OK)
+class BlogsAPIView(APIView):
+    def get (self,request,slug=None):
+        try:
+            if slug:
+                instances = general_model.Blogs.objects.filter(slug=slug,is_deleted=False).first()
+                serializer = general_serializer.BlogsSeralizer(instances,context={'request': self.request})
+                suggestion_instance = general_model.Blogs.objects.filter(is_deleted=False).exclude(id=instances.id).order_by('-date_added')[:3]
+                suggestion_serializer = general_serializer.BlogsSeralizer(suggestion_instance,many=True,context={'request': self.request})
+            else:
+                start_limit = int(request.query_params.get('start_limit',0))
+                end_limit = int(request.query_params.get('end_limit',7))
+                instances = general_model.Blogs.objects.filter(is_deleted=False)[start_limit:end_limit]
+                serializer = general_serializer.BlogsSeralizer(instances, many=True,context={'request': self.request})
+                total_count = general_model.Blogs.objects.filter(is_deleted=False).count()
+            response_data = {
+                "StatusCode": 6000,
+                "detail": "Success",
+                "data": serializer.data,
+                "total_count": "" if slug else total_count,
+                "suggestions" : suggestion_serializer.data if slug else "",
+                "message": "Blogs Data fetched successfully"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "error",
+                "data" : "",
+                "message": f"Failed to fetch Blogs Data: {str(e)}"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+
+
+class NewsAndEventsAPIView(APIView):
+    def get (self,request,slug=None):
+        try:
+            if slug:
+                instances = general_model.NewAndEvents.objects.filter(slug=slug,is_deleted=False).first()
+                serializer = general_serializer.NewsAndEventsSeralizer(instances,context={'request': self.request})
+                suggestion_instance = general_model.NewAndEvents.objects.filter(is_deleted=False).exclude(id=instances.id).order_by('-date_added')[:3]
+                suggestion_serializer = general_serializer.NewsAndEventsSeralizer(suggestion_instance,many=True,context={'request': self.request})
+            else:
+                start_limit = int(request.query_params.get('start_limit',0))
+                end_limit = int(request.query_params.get('end_limit',7))
+                instances = general_model.NewAndEvents.objects.filter(is_deleted=False)[start_limit:end_limit]
+                serializer = general_serializer.NewsAndEventsSeralizer(instances, many=True,context={'request': self.request})
+                total_count = general_model.NewAndEvents.objects.filter(is_deleted=False).count()
+            response_data = {
+                "StatusCode": 6000,
+                "detail": "Success",
+                "data": serializer.data,
+                "total_count": "" if slug else total_count,
+                "suggestions" : suggestion_serializer.data if slug else "",
+                "message": "Blogs Data fetched successfully"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "error",
+                "data" : "",
+                "message": f"Failed to fetch Blogs Data: {str(e)}"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
 
 

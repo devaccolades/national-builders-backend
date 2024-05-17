@@ -30,3 +30,8 @@ class ProjectSerializer(serializers.ModelSerializer):
         return amenities
     
 
+class RentalEnquirySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = project_models.RentalEnquiry
+        fields = ['first_name','last_name', 'email', 'rentals', 'phone', 'message']

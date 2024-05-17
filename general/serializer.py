@@ -45,9 +45,13 @@ class BlogsSeralizer(serializers.ModelSerializer):
         return obj.date_added.strftime("%B %d, %Y") if obj.date_added else None
 
 class NewsAndEventsSeralizer(serializers.ModelSerializer):
+    date_added = serializers.SerializerMethodField()
     class Meta:
         model = NewAndEvents
-        fields = ['id','image','title','body','youtube_link','image_alt','meta_tag','meta_description','slug']
+        fields = ['id','image','title','body','youtube_link','image_alt','meta_tag','meta_description','slug','date_added']
+
+    def get_date_added(self, obj):  
+        return obj.date_added.strftime("%B %d, %Y") if obj.date_added else None
 
 class SeoSeralizer(serializers.ModelSerializer):
     class Meta:
