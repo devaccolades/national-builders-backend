@@ -16,6 +16,7 @@ class BaseModel(models.Model):
 class CompanyBranch(BaseModel):
     location = models.CharField(max_length=150)
     image = models.ImageField(upload_to='companybranch/image', null=True, blank=True)
+    image_alt = models.CharField(max_length=125, null=True, blank=True)
     iframe = models.TextField(null=True, blank=True)
     address = models.TextField(null=True, blank=True)
     email = models.CharField(max_length=255,null=True, blank=True)
@@ -36,6 +37,7 @@ class CompanyBranch(BaseModel):
 class KeyHandOver(BaseModel):
     name = models.CharField(max_length=255,null=True,blank=True)
     image = models.ImageField(upload_to='keyhandover/image', null=True, blank=True)
+    image_alt = models.CharField(max_length=125, null=True, blank=True)
 
     class Meta:
             db_table = 'keyhandover'
@@ -50,6 +52,7 @@ class KeyHandOver(BaseModel):
 class Testimonials(BaseModel):
     name = models.CharField(max_length=255,null=True,blank=True)
     image = models.ImageField(upload_to='testimonials/image', null=True, blank=True)
+    image_alt = models.CharField(max_length=125, null=True, blank=True)
     project=models.ForeignKey('project.Project',on_delete=models.CASCADE,null=True,blank=True)
     description = models.TextField(null=True, blank=True)
 
@@ -127,6 +130,7 @@ class ProjectCounts(models.Model):
 
 class AwardsImages(BaseModel):
     images = models.ImageField(upload_to='awards/image', null=True, blank=True)
+    image_alt = models.CharField(max_length=125, null=True, blank=True)
     order = models.IntegerField(blank=True,null=True,default=1)
     class Meta:
         db_table = 'awardsimages'

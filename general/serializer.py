@@ -3,12 +3,14 @@ from .models import *
 class CompanyBranchSerializer(serializers.ModelSerializer):
     class Meta:  
         model = CompanyBranch
-        fields = '__all__'
-    def get_image(self, obj):
-        if obj.image:
-            return self.context['request'].build_absolute_uri(obj.image.url)
-        return None
+        fields = ['id', 'location','image','image_alt','iframe','address','email','phone_number','show_user_side']
+
+class CompanyBranchSaveSerializer(serializers.ModelSerializer):
+    class Meta:  
+        model = CompanyBranch
+        fields = ['id', 'location','image','image_alt','iframe','address','email','phone_number']
         
+
 class CompanyBranchDropDownSerializer(serializers.ModelSerializer):
     class Meta:
         model = CompanyBranch
@@ -17,18 +19,18 @@ class CompanyBranchDropDownSerializer(serializers.ModelSerializer):
 class KeyHandoverSeralizer(serializers.ModelSerializer):
     class Meta:
         model = KeyHandOver
-        fields = ['id', 'image','name']
+        fields = ['id', 'image','name','image_alt']
 
 class TestimonialsSaveSeralizer(serializers.ModelSerializer):
     class Meta:
         model = Testimonials
-        fields = ['id','image','name','project','description']
+        fields = ['id','image','name','project','description','image_alt']
 
 class TestimonialsSeralizer(serializers.ModelSerializer):
     project = serializers.SerializerMethodField()
     class Meta:
         model = Testimonials
-        fields = ['id', 'image','name','project','description']
+        fields = ['id', 'image','name','project','description','image_alt']
 
     def get_project(self, obj):
         from project.serializer import ProjectListSerializer 
@@ -66,7 +68,7 @@ class ProjectCountsSeralizer(serializers.ModelSerializer):
 class AwardsImagesSeralizer(serializers.ModelSerializer):
     class Meta:
         model = AwardsImages
-        fields = ['id','images','order']
+        fields = ['id','images','order','image_alt']
 
 
 class HomePageVideoImagesSeralizer(serializers.ModelSerializer):

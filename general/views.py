@@ -43,7 +43,7 @@ class BranchAPIView(APIView):
         data = request.data.copy()        
         if 'image' not in data or data['image'] == "":
             data['image'] = instance.image
-        serializer = CompanyBranchSerializer(instance, data=data)
+        serializer = CompanyBranchSaveSerializer(instance, data=data)
         
         if serializer.is_valid():
             serializer.save()
@@ -621,7 +621,10 @@ class AwardsAPIView(APIView):
     
     def patch(self, request, id):
         instance = self.get_object(id)
-        serializer = AwardsImagesSeralizer(instance, data=request.data)
+        data = request.data.copy()        
+        if 'images' not in data or data['images'] == "":
+            data['images'] = instance.images
+        serializer = AwardsImagesSeralizer(instance, data=data)
         
         if serializer.is_valid():
             serializer.save()

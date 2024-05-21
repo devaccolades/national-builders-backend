@@ -1,14 +1,18 @@
 from django.shortcuts import render
+from django.core.mail import send_mail
+from django.template.loader import get_template
+from django.conf import settings
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+
 
 from general import models as general_model
 from general import serializer as general_serializer
 from project import models as project_models
 from project import serializer as project_serializer
 from . import serializer as client_serialzer
-
 from general.views import CompanyBranchDropdownListView
 
 class DataAPIView(APIView):
@@ -127,6 +131,7 @@ class ProjectsAPIView(APIView):
                 specification_serializer = project_serializer.SpecificationsSerializer(specification_instance, many=True)
                 distance_instance = project_models.ProjectDistance.objects.filter(project=instance.id, is_deleted=False)
                 distance_serializer = project_serializer.DistanceSerializer(distance_instance, many=True)
+
                 response_data={
                     "StatusCode": 6000,
                     "detail": "success",
@@ -182,35 +187,6 @@ class RentalsAPIView(APIView):
             }
         return Response(response_data, status=status.HTTP_200_OK)
         
-class RentalsEnquiryAPIView(APIView):
-     def post(self, request):
-        try:
-            serializer = client_serialzer.RentalEnquirySerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                response_data = {
-                    "StatusCode": 6001,
-                    "detail": "success",
-                    "data": serializer.data,
-                    "message": "Rental Enquiry successfully"
-                }
-            else:
-                response_data = {
-                    "StatusCode": 6002,
-                    "detail": "validation error",
-                    "data": serializer.errors,
-                    "message": "Invalid data"
-                }
-        except Exception as e:
-            response_data = {
-                "StatusCode": 6002,
-                "detail": "error",
-                "data":"",
-                "message": f'Something went wrong {e}'
-            }
-        return Response(response_data, status=status.HTTP_200_OK)
-
-from rest_framework.pagination import PageNumberPagination
 
 class TestimonialsAPIView(APIView):
     def get (self,request):
@@ -305,3 +281,152 @@ class NewsAndEventsAPIView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
 
 
+class KeyHandOverAPIView(APIView):
+    def get(self, request):
+        try:
+            show_method = request.query_params.get('show_method', 'false').lower() == 'true'
+            
+            if show_method:
+                instance = general_model.KeyHandOver.objects.filter(is_deleted=False)
+                serializer = general_serializer.KeyHandoverSeralizer(instance,many=True, context={'request': self.request})
+            else:
+                start_limit = int(request.query_params.get('start_limit', 0))
+                end_limit = int(request.query_params.get('end_limit', 7))
+                instance = general_model.KeyHandOver.objects.filter(is_deleted=False)[start_limit:end_limit]
+                serializer = general_serializer.KeyHandoverSeralizer(instance, many=True, context={'request': self.request})
+                total_count = general_model.KeyHandOver.objects.filter(is_deleted=False).count()
+            
+            response_data = {
+                "StatusCode": 6000,
+                "detail": "Success",
+                "data": serializer.data,
+                "total_count": "" if show_method else total_count,
+                "message": "Key Hand Over Data fetched successfully"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "Error",
+                "data": "",
+                "message": f"Failed to fetch Key Hand Over Data: {str(e)}"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+
+
+class BranchAPIView(APIView):
+    def get(self, request):
+        try:
+            instance = general_model.CompanyBranch.objects.filter(is_deleted=False,show_user_side=True)[:2]
+            serializer = general_serializer.CompanyBranchSerializer(instance, many=True, context={'request': self.request})
+            response_data = {
+                "StatusCode": 6000,
+                "detail": "Success",
+                "data": serializer.data,
+                "message": "Key Hand Over Data fetched successfully"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "Error",
+                "data": "",
+                "message": f"Failed to fetch Key Hand Over Data: {str(e)}"
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+
+
+class RentalsEnquiryAPIView(APIView):
+     def post(self, request):
+        try:
+            serializer = client_serialzer.RentalEnquirySerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+
+                context = {
+                    'name': f"{serializer.validated_data['first_name']} {serializer.validated_data['last_name']}",
+                    'email': serializer.validated_data['email'],
+                    'phone': serializer.validated_data['phone'],
+                    'message': serializer.validated_data['message'],
+                    'rentals': serializer.validated_data['rentals']
+                }
+
+                template = get_template('rental_enquiry.html').render(context)
+                e=settings.EMAIL_HOST_USER
+                send_mail(
+                    'Enquiry Data',
+                    None, 
+                    settings.EMAIL_HOST_USER,
+                    [e],
+                    fail_silently=False,
+                    html_message = template,
+                    )
+                response_data = {
+                    "StatusCode": 6001,
+                    "detail": "success",
+                    "data": serializer.data,
+                    "message": "Rental Enquiry successfully"
+                }
+            else:
+                response_data = {
+                    "StatusCode": 6002,
+                    "detail": "validation error",
+                    "data": serializer.errors,
+                    "message": "Invalid data"
+                }
+        except Exception as e:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "error",
+                "data":"",
+                "message": f'Something went wrong {e}'
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+     
+
+class EnquiryAPIView(APIView):
+     def post(self, request):
+        try:
+            serializer = client_serialzer.EnquirySerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                
+                context = {
+                    'name': f"{serializer.validated_data['first_name']} {serializer.validated_data['last_name']}",
+                    'email': serializer.validated_data['email'],
+                    'phone': serializer.validated_data['phone'],
+                    'message': serializer.validated_data['message'],
+                    'project': serializer.validated_data['project'] if serializer.validated_data['project'] else None
+                }
+
+                template = get_template('enquiry.html').render(context)
+                e=settings.EMAIL_HOST_USER
+                send_mail(
+                    'Enquiry Data',
+                    None, 
+                    settings.EMAIL_HOST_USER,
+                    [e],
+                    fail_silently=False,
+                    html_message = template,
+                    )
+                response_data = {
+                    "StatusCode": 6001,
+                    "detail": "success",
+                    "data": serializer.data,
+                    "message": "Enquiry successfully"
+                }
+            else:
+                response_data = {
+                    "StatusCode": 6002,
+                    "detail": "validation error",
+                    "data": serializer.errors,
+                    "message": "Invalid data"
+                }
+        except Exception as e:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "error",
+                "data":"",
+                "message": f'Something went wrong {e}'
+            }
+        return Response(response_data, status=status.HTTP_200_OK)

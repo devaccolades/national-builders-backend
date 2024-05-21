@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404
 class AmenitiesSerializer(serializers.ModelSerializer):
     class Meta:  
         model = ProjectAmenities
-        fields = ['id','logo','title']
+        fields = ['id','logo','title','image_alt']
     def get_logo(self, obj):
         if obj.logo:
             return self.context['request'].build_absolute_uri(obj.image.url)
@@ -16,7 +16,7 @@ class AmenitiesSerializer(serializers.ModelSerializer):
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:  
         model = Project
-        fields = ['name', 'thumbnail', 'description', 'rera_number', 'qr_code', 'location', 'company_branch', 'type', 'status', 'units', 'bedrooms', 'area_from', 'area_to', 'iframe', 'meta_title', 'meta_description', 'slug']
+        fields = ['name', 'thumbnail','thumbnail_alt', 'description', 'rera_number', 'qr_code','qr_code_alt', 'location', 'company_branch', 'type', 'status', 'units', 'bedrooms', 'area_from', 'area_to', 'iframe', 'meta_title', 'meta_description', 'slug']
 
     def clean_amenities(self):
         amenities = self.cleaned_data.get('amenities')
@@ -27,7 +27,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 class ProjectListSerializer(serializers.ModelSerializer):
     class Meta:  
         model = Project
-        fields = ['id','name', 'thumbnail', 'description', 'rera_number', 'qr_code', 'location', 'company_branch', 'type', 'status', 'units', 'bedrooms', 'area_from', 'area_to', 'iframe', 'meta_title', 'meta_description', 'slug','amenities']
+        fields = ['id','name', 'thumbnail','thumbnail_alt', 'description', 'rera_number', 'qr_code','qr_code_alt', 'location', 'company_branch', 'type', 'status', 'units', 'bedrooms', 'area_from', 'area_to', 'iframe', 'meta_title', 'meta_description', 'slug','amenities']
 
 class ProjectDropDownListSerializer(serializers.ModelSerializer):
     class Meta:  
@@ -37,26 +37,13 @@ class ProjectDropDownListSerializer(serializers.ModelSerializer):
 class ProjectImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProjectImages
-        fields = ['id','project','images']
-
-class ProjectImageSaveSerializer(serializers.Serializer):
-    project = serializers.CharField() 
-    images = serializers.ListField(child=serializers.ImageField())
-
-    def create(self, validated_data):
-        project_id = validated_data['project']
-        images = validated_data['images']
-        project_instance = get_object_or_404(Project, id=project_id)
-        for image in images:
-            ProjectImages.objects.create(project=project_instance, images=image)
-        
-        return validated_data
+        fields = ['id','project','images','image_alt']
         
 
 class FloorPlanSerializer(serializers.ModelSerializer):
     class Meta:
         model = FloorPlanImages
-        fields = ['id','project','images','title']
+        fields = ['id','project','images','title','image_alt']
 
 class SpecificationsSerializer(serializers.ModelSerializer):
     class Meta:
@@ -71,13 +58,13 @@ class DistanceSerializer(serializers.ModelSerializer):
 class RentalsSaveSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rentals
-        fields = ['name','image','company_branch','type','area','price']
+        fields = ['name','image','company_branch','type','area','price','image_alt']
 
 class RentalsSerializer(serializers.ModelSerializer):
     company_branch = CompanyBranchDropDownSerializer()
     class Meta:
         model = Rentals
-        fields = ['id','name','image','company_branch','type','area','price','is_hide']
+        fields = ['id','name','image','company_branch','type','area','price','is_hide','image_alt']
 
 
 class EnquirySerializer(serializers.ModelSerializer):
@@ -86,7 +73,7 @@ class EnquirySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Enquiry
-        fields = ['id', 'name', 'email', 'project', 'phone', 'message', 'is_read', 'enquiry_date',]
+        fields = ['id', 'first_name','last_name', 'email', 'project', 'phone', 'message', 'is_read', 'enquiry_date',]
 
     def get_enquiry_date(self, obj):  
         return obj.enquiry_date.strftime("%Y-%m-%d %H:%M") 
@@ -95,6 +82,7 @@ class EnquirySerializer(serializers.ModelSerializer):
 class EnquiryDownloadSerializer(serializers.ModelSerializer):
     project = serializers.SerializerMethodField()
     enquiry_date = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
 
     class Meta:
         model = Enquiry
@@ -108,6 +96,16 @@ class EnquiryDownloadSerializer(serializers.ModelSerializer):
             return obj.project.name
         else:
             return ''
+    def get_name(self, obj):
+        name = ''
+        if obj.first_name:
+            name += obj.first_name
+        if obj.last_name:
+            if name: 
+                name += ' '
+            name += obj.last_name
+        return name
+
 
     
 class RentalEnquirySerializer(serializers.ModelSerializer):
@@ -116,7 +114,7 @@ class RentalEnquirySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RentalEnquiry
-        fields = ['id', 'name', 'email', 'rentals', 'phone', 'message', 'is_read', 'enquiry_date',]
+        fields = ['id', 'first_name','last_name', 'email', 'rentals', 'phone', 'message', 'is_read', 'enquiry_date',]
 
     def get_enquiry_date(self, obj):  
         return obj.enquiry_date.strftime("%Y-%m-%d %H:%M") 
@@ -125,6 +123,7 @@ class RentalEnquirySerializer(serializers.ModelSerializer):
 class RentalEnquiryDownloadSerializer(serializers.ModelSerializer):
     rentals = serializers.SerializerMethodField()
     enquiry_date = serializers.SerializerMethodField()
+    name = serializers.SerializerMethodField()
 
     class Meta:
         model = Enquiry
@@ -138,3 +137,12 @@ class RentalEnquiryDownloadSerializer(serializers.ModelSerializer):
             return obj.rentals.name
         else:
             return ''
+    def get_name(self, obj):
+        name = ''
+        if obj.first_name:
+            name += obj.first_name
+        if obj.last_name:
+            if name: 
+                name += ' '
+            name += obj.last_name
+        return name
