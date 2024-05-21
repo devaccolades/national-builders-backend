@@ -389,7 +389,7 @@ class EnquiryAPIView(APIView):
         try:
             serializer = client_serialzer.EnquirySerializer(data=request.data)
             if serializer.is_valid():
-                # serializer.save()
+                serializer.save()
                 
                 context = {
                     'name': f"{serializer.validated_data['first_name']} {serializer.validated_data['last_name']}",
