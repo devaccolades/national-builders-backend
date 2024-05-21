@@ -24,6 +24,8 @@ urlpatterns = [
     path('key-hand-over/', KeyHandOverAPIView.as_view(), name='key-hand-over-api'),
     
     path('branch/', BranchAPIView.as_view(), name='branch-api'),
+    
+    path('seo/', SeoAPIView.as_view(), name='seo-api'),
 
 
 ]
