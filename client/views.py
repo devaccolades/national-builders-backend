@@ -186,6 +186,103 @@ class RentalsAPIView(APIView):
                 "message": f'Something went wrong {e}'
             }
         return Response(response_data, status=status.HTTP_200_OK)
+    
+
+
+class RentalsEnquiryAPIView(APIView):
+     def post(self, request):
+        try:
+            serializer = client_serialzer.RentalEnquirySerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+
+                context = {
+                    'name': f"{serializer.validated_data['first_name']} {serializer.validated_data['last_name']}",
+                    'email': serializer.validated_data['email'],
+                    'phone': serializer.validated_data['phone'],
+                    'message': serializer.validated_data['message'],
+                    'rentals': serializer.validated_data['rentals']
+                }
+
+                template = get_template('rental_enquiry.html').render(context)
+                e=settings.EMAIL_HOST_USER
+                send_mail(
+                    'Enquiry Data',
+                    None, 
+                    settings.EMAIL_HOST_USER,
+                    [e],
+                    fail_silently=False,
+                    html_message = template,
+                    )
+                response_data = {
+                    "StatusCode": 6001,
+                    "detail": "success",
+                    "data": serializer.data,
+                    "message": "Rental Enquiry successfully"
+                }
+            else:
+                response_data = {
+                    "StatusCode": 6002,
+                    "detail": "validation error",
+                    "data": serializer.errors,
+                    "message": "Invalid data"
+                }
+        except Exception as e:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "error",
+                "data":"",
+                "message": f'Something went wrong {e}'
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+     
+
+class EnquiryAPIView(APIView):
+     def post(self, request):
+        try:
+            serializer = client_serialzer.EnquirySerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                
+                context = {
+                    'name': f"{serializer.validated_data['first_name']} {serializer.validated_data['last_name']}",
+                    'email': serializer.validated_data['email'],
+                    'phone': serializer.validated_data['phone'],
+                    'message': serializer.validated_data['message'],
+                    'project': serializer.validated_data['project'] if request.data.get('project') else None
+                }
+                template = get_template('enquiry.html').render(context)
+                e=settings.EMAIL_HOST_USER
+                send_mail(
+                    'Enquiry Data',
+                    None, 
+                    settings.EMAIL_HOST_USER,
+                    [e],
+                    fail_silently=False,
+                    html_message = template,
+                    )
+                response_data = {
+                    "StatusCode": 6001,
+                    "detail": "success",
+                    "data": serializer.data,
+                    "message": "Enquiry successfully"
+                }
+            else:
+                response_data = {
+                    "StatusCode": 6002,
+                    "detail": "validation error",
+                    "data": serializer.errors,
+                    "message": "Invalid data"
+                }
+        except Exception as e:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "error",
+                "data":"",
+                "message": f'Something went wrong {e}'
+            }
+        return Response(response_data, status=status.HTTP_200_OK)
+     
         
 
 class TestimonialsAPIView(APIView):
@@ -336,101 +433,6 @@ class BranchAPIView(APIView):
             return Response(response_data, status=status.HTTP_200_OK)
 
 
-class RentalsEnquiryAPIView(APIView):
-     def post(self, request):
-        try:
-            serializer = client_serialzer.RentalEnquirySerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-
-                context = {
-                    'name': f"{serializer.validated_data['first_name']} {serializer.validated_data['last_name']}",
-                    'email': serializer.validated_data['email'],
-                    'phone': serializer.validated_data['phone'],
-                    'message': serializer.validated_data['message'],
-                    'rentals': serializer.validated_data['rentals']
-                }
-
-                template = get_template('rental_enquiry.html').render(context)
-                e=settings.EMAIL_HOST_USER
-                send_mail(
-                    'Enquiry Data',
-                    None, 
-                    settings.EMAIL_HOST_USER,
-                    [e],
-                    fail_silently=False,
-                    html_message = template,
-                    )
-                response_data = {
-                    "StatusCode": 6001,
-                    "detail": "success",
-                    "data": serializer.data,
-                    "message": "Rental Enquiry successfully"
-                }
-            else:
-                response_data = {
-                    "StatusCode": 6002,
-                    "detail": "validation error",
-                    "data": serializer.errors,
-                    "message": "Invalid data"
-                }
-        except Exception as e:
-            response_data = {
-                "StatusCode": 6002,
-                "detail": "error",
-                "data":"",
-                "message": f'Something went wrong {e}'
-            }
-        return Response(response_data, status=status.HTTP_200_OK)
-     
-
-class EnquiryAPIView(APIView):
-     def post(self, request):
-        try:
-            serializer = client_serialzer.EnquirySerializer(data=request.data)
-            if serializer.is_valid():
-                # serializer.save()
-                
-                context = {
-                    'name': f"{serializer.validated_data['first_name']} {serializer.validated_data['last_name']}",
-                    'email': serializer.validated_data['email'],
-                    'phone': serializer.validated_data['phone'],
-                    'message': serializer.validated_data['message'],
-                    'project': serializer.validated_data['project'] if request.data.get('project') else None
-                }
-
-                template = get_template('enquiry.html').render(context)
-                e=settings.EMAIL_HOST_USER
-                send_mail(
-                    'Enquiry Data',
-                    None, 
-                    settings.EMAIL_HOST_USER,
-                    [e],
-                    fail_silently=False,
-                    html_message = template,
-                    )
-                response_data = {
-                    "StatusCode": 6001,
-                    "detail": "success",
-                    "data": serializer.data,
-                    "message": "Enquiry successfully"
-                }
-            else:
-                response_data = {
-                    "StatusCode": 6002,
-                    "detail": "validation error",
-                    "data": serializer.errors,
-                    "message": "Invalid data"
-                }
-        except Exception as e:
-            response_data = {
-                "StatusCode": 6002,
-                "detail": "error",
-                "data":"",
-                "message": f'Something went wrong {e}'
-            }
-        return Response(response_data, status=status.HTTP_200_OK)
-     
 
 class SeoAPIView(APIView):
     def get(self, request):
