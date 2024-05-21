@@ -430,3 +430,26 @@ class EnquiryAPIView(APIView):
                 "message": f'Something went wrong {e}'
             }
         return Response(response_data, status=status.HTTP_200_OK)
+     
+
+class SeoAPIView(APIView):
+    def get(self, request):
+        try:
+            path = str(request.query_params.get('path', '/'))
+            instance = general_model.SEO.objects.filter(path=path,is_deleted=False).first()
+            serializer = general_serializer.SeoSeralizer(instance)
+            response_data = {
+                "StatusCode": 6000,
+                "detail": "success",
+                "data":serializer.data,
+                "message": "Data retrieved successfully"
+                }
+        except Exception as e:
+            response_data = {
+                "StatusCode": 6002,
+                "detail": "error",
+                "data":"",
+                "message": f'Something went wrong {e}'
+                }
+        return Response(response_data, status=status.HTTP_200_OK)
+     
