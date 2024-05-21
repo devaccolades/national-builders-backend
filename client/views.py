@@ -389,14 +389,14 @@ class EnquiryAPIView(APIView):
         try:
             serializer = client_serialzer.EnquirySerializer(data=request.data)
             if serializer.is_valid():
-                serializer.save()
+                # serializer.save()
                 
                 context = {
                     'name': f"{serializer.validated_data['first_name']} {serializer.validated_data['last_name']}",
                     'email': serializer.validated_data['email'],
                     'phone': serializer.validated_data['phone'],
                     'message': serializer.validated_data['message'],
-                    'project': serializer.validated_data['project'] if serializer.validated_data['project'] else None
+                    'project': serializer.validated_data['project'] if request.data.get('project') else None
                 }
 
                 template = get_template('enquiry.html').render(context)
