@@ -398,7 +398,6 @@ class EnquiryAPIView(APIView):
                     'message': serializer.validated_data['message'],
                     'project': serializer.validated_data['project'] if request.data.get('project') else None
                 }
-
                 template = get_template('enquiry.html').render(context)
                 e=settings.EMAIL_HOST_USER
                 send_mail(
