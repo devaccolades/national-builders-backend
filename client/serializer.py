@@ -7,7 +7,7 @@ class TestimonialsSeralizer(serializers.ModelSerializer):
     project = serializers.SerializerMethodField()
     class Meta:
         model = general_models.Testimonials
-        fields = ['id', 'image','name','project','description']
+        fields = ['id', 'image','name','project','description','image_alt']
 
     def get_project(self, obj):
         return obj.project.name
@@ -21,7 +21,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     company_branch = CompanyBranchSerializer()
     class Meta:  
         model = project_models.Project
-        fields = ['id','name', 'thumbnail', 'description', 'rera_number', 'qr_code', 'location', 'company_branch', 'type', 'status', 'units', 'bedrooms', 'area_from', 'area_to', 'iframe', 'meta_title', 'meta_description', 'slug']
+        fields = ['id','name', 'thumbnail', 'thumbnail_alt','description', 'rera_number', 'qr_code','qr_code_alt', 'location', 'company_branch', 'type', 'status', 'units', 'bedrooms', 'area_from', 'area_to', 'iframe', 'meta_title', 'meta_description', 'slug']
 
     def clean_amenities(self):
         amenities = self.cleaned_data.get('amenities')
@@ -31,7 +31,12 @@ class ProjectSerializer(serializers.ModelSerializer):
     
 
 class RentalEnquirySerializer(serializers.ModelSerializer):
-
     class Meta:
         model = project_models.RentalEnquiry
         fields = ['first_name','last_name', 'email', 'rentals', 'phone', 'message']
+
+
+class EnquirySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = project_models.Enquiry
+        fields = ['first_name','last_name', 'email', 'phone', 'message','project']

@@ -9,7 +9,9 @@ urlpatterns = [
     path('branch-dropdown/', BranchDropDownAPIView.as_view(), name='branch-dropdown-api'),
     
     path('rentals/', RentalsAPIView.as_view(), name='rentals-api'),
+    
     path('rental-enquiry/', RentalsEnquiryAPIView.as_view(), name='rentals-enquiry-api'),
+    path('enquiry/', EnquiryAPIView.as_view(), name='enquiry-api'),
 
     path('testimonials/', TestimonialsAPIView.as_view(), name='testimonials-api'),
     
@@ -18,6 +20,10 @@ urlpatterns = [
     
     path('news-and-events/', NewsAndEventsAPIView.as_view(), name='news-blogs-api'),
     path('news-and-events/<slug:slug>/', NewsAndEventsAPIView.as_view(), name='news-blogs-api'),
+    
+    path('key-hand-over/', KeyHandOverAPIView.as_view(), name='key-hand-over-api'),
+    
+    path('branch/', BranchAPIView.as_view(), name='branch-api'),
 
 
 ]

@@ -211,7 +211,7 @@ class ProjectCountAPIView(APIView):
 class ProjectImagesApiView(APIView):
     permission_classes = (IsAdminUser,)
     def post(self, request):
-        serializer = ProjectImageSaveSerializer(data=request.data)
+        serializer = ProjectImageSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             response_data={
@@ -250,7 +250,10 @@ class ProjectImagesApiView(APIView):
         
     def patch(self, request, id):
         instance = self.get_object(id)
-        serializer = ProjectImageSerializer(instance, data=request.data,partial=True,context={'request': request})
+        data = request.data.copy()
+        if 'images' not in data or data['images'] == "":
+            data['images'] = instance.images
+        serializer = ProjectImageSerializer(instance, data=data,partial=True,context={'request': request})
         if serializer.is_valid():
             serializer.save()
             response_data={

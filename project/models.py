@@ -26,6 +26,7 @@ PROJECT_DISTANCE_CHOICES = (
 
 class ProjectAmenities(BaseModel):
     logo = models.FileField(upload_to='projects/image', null=True, blank=True)
+    image_alt = models.CharField(max_length=125, null=True, blank=True)
     title = models.CharField(max_length=128, null=True, blank=True)
 
     class Meta:
@@ -38,9 +39,11 @@ class ProjectAmenities(BaseModel):
 class Project(BaseModel):
     name = models.CharField(max_length=255, unique=True)
     thumbnail = models.ImageField(upload_to='projects/image', null=True, blank=True)
+    thumbnail_alt = models.CharField(max_length=125, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     rera_number=models.CharField(max_length=500,blank=True,null=True)
     qr_code=models.ImageField(upload_to='projects/image',blank=True,null=True)
+    qr_code_alt = models.CharField(max_length=125, null=True, blank=True)
     location=models.CharField(max_length=500,blank=True,null=True) 
     company_branch = models.ForeignKey(CompanyBranch, on_delete=models.SET_NULL, null=True)
     type = models.CharField(choices=PROJECT_TYPE_CHOICES, max_length=255)
@@ -59,7 +62,7 @@ class Project(BaseModel):
         db_table = 'Projects'
         verbose_name = ('project')
         verbose_name_plural = ('projects')
-        ordering = ('date_added',)
+        ordering = ('-date_added',)
 
     def __str__(self):
         return self.name
@@ -67,6 +70,7 @@ class Project(BaseModel):
 class ProjectImages(BaseModel):
     project=models.ForeignKey(Project,on_delete=models.CASCADE)
     images = models.ImageField(upload_to='projects/image', null=True, blank=True)
+    image_alt = models.CharField(max_length=125, null=True, blank=True)
     order = models.IntegerField(blank=True,null=True,default=1)
     class Meta:
         db_table = 'ProjectImages'
@@ -77,6 +81,7 @@ class ProjectImages(BaseModel):
 class FloorPlanImages(BaseModel):
     project=models.ForeignKey(Project,on_delete=models.CASCADE)
     images = models.ImageField(upload_to='projects/image', null=True, blank=True)
+    image_alt = models.CharField(max_length=125, null=True, blank=True)
     title = models.CharField(max_length=255,blank=True,null=True)
     order = models.IntegerField(blank=True,null=True,default=1)
     class Meta:
@@ -112,6 +117,7 @@ class ProjectDistance(BaseModel):
 class Rentals(BaseModel):
     name = models.CharField(max_length=255, unique=True)
     image = models.ImageField(upload_to='rentals/image', null=True, blank=True)
+    image_alt = models.CharField(max_length=125, null=True, blank=True)
     company_branch = models.ForeignKey(CompanyBranch, on_delete=models.SET_NULL, null=True)
     type = models.CharField(choices=PROJECT_TYPE_CHOICES, max_length=255)
     area = models.CharField(max_length=255,blank=True,null=True)
