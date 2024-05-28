@@ -88,7 +88,7 @@ class NewAndEvents(BaseModel):
     title = models.CharField(max_length=300, blank=True, default='',null=True)
     body = RichTextField(blank=True)
     image_alt = models.CharField(max_length=125, null=True, blank=True)
-    youtube_link = models.CharField(max_length=255, blank=True, null=True)
+    youtube_link = models.TextField(blank=True, null=True)
     meta_tag=models.CharField(max_length=300, blank=True, default='',null=True)
     meta_description=models.CharField(max_length=300, blank=True, default='',null=True)
     slug = models.SlugField(default="", unique=True)
