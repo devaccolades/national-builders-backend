@@ -148,13 +148,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
-
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-    'http://127.0.0.1:5173',    
-    'https://national-builders.accoladesweb.com',
-    'http://national-builders.accoladesweb.com',
-]
+if DEBUG:
+   CORS_ALLOWED_ORIGINS = [
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',    
+        'https://national-builders.accoladesweb.com',
+        'http://national-builders.accoladesweb.com',
+    ]
+else:
+    CORS_ALLOWED_ORIGINS = [
+        'http://national.mywebhosting.in',
+        'https://national.mywebhosting.in'
+        'http://www.national.mywebhosting.in',
+        'https://www.national.mywebhosting.in',
+    ]
 
 
 REST_FRAMEWORK = {
