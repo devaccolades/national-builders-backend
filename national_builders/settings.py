@@ -159,8 +159,12 @@ else:
     CORS_ALLOWED_ORIGINS = [
         'http://chief.nationalbuilders.in',
         'https://chief.nationalbuilders.in',
+        'https://www.chief.nationalbuilders.in',
+        'https://www.chief.nationalbuilders.in',
         'http://admin.nationalbuilders.in',
         'https://admin.nationalbuilders.in',
+        'http://www.admin.nationalbuilders.in',
+        'https://www.admin.nationalbuilders.in',
     ]
 
 
