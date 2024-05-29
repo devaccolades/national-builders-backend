@@ -157,11 +157,12 @@ if DEBUG:
     ]
 else:
     CORS_ALLOWED_ORIGINS = [
-        'http://national.mywebhosting.in',
-        'https://national.mywebhosting.in'
-        'http://www.national.mywebhosting.in',
-        'https://www.national.mywebhosting.in',
+        'http://chief.nationalbuilders.in',
+        'https://chief.nationalbuilders.in',
+        'http://admin.nationalbuilders.in',
+        'https://admin.nationalbuilders.in',
     ]
+
 
 
 REST_FRAMEWORK = {
