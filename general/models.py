@@ -71,7 +71,8 @@ class Blogs(BaseModel):
     body = RichTextField(blank=True)
     image_alt = models.CharField(max_length=125, null=True, blank=True)
     meta_tag=models.CharField(max_length=300, blank=True, default='',null=True)
-    meta_description=models.CharField(max_length=300, blank=True, default='',null=True)
+    meta_description=models.TextField(blank=True,null=True)
+
     slug = models.SlugField(default="", unique=True)
 
     class Meta:
@@ -90,7 +91,7 @@ class NewAndEvents(BaseModel):
     image_alt = models.CharField(max_length=125, null=True, blank=True)
     youtube_link = models.TextField(blank=True, null=True)
     meta_tag=models.CharField(max_length=300, blank=True, default='',null=True)
-    meta_description=models.CharField(max_length=300, blank=True, default='',null=True)
+    meta_description=models.TextField(blank=True,null=True)
     slug = models.SlugField(default="", unique=True)
 
     class Meta:

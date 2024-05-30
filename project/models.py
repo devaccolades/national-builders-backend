@@ -7,6 +7,8 @@ PROJECT_TYPE_CHOICES = (
     ('villas', 'villas'),
     ('commercial', 'commercial'),
     ('rental', 'rental'),
+    ('residential cum commercial', 'residential cum commercial'),
+    ('residential','residential'),
     ('other','other')
 )
 
