@@ -210,7 +210,7 @@ class RentalsEnquiryAPIView(APIView):
                     'Enquiry Data',
                     None, 
                     settings.EMAIL_HOST_USER,
-                    [e],
+                    ['smm@nationalbuilders.in'],
                     fail_silently=False,
                     html_message = template,
                     )
@@ -257,7 +257,7 @@ class EnquiryAPIView(APIView):
                     'Enquiry Data',
                     None, 
                     settings.EMAIL_HOST_USER,
-                    [e],
+                    ['smm@nationalbuilders.in'],
                     fail_silently=False,
                     html_message = template,
                     )
