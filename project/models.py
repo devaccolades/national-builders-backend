@@ -7,8 +7,8 @@ PROJECT_TYPE_CHOICES = (
     ('villas', 'villas'),
     ('commercial', 'commercial'),
     ('rental', 'rental'),
-    ('residential cum commercial', 'residential cum commercial'),
     ('residential','residential'),
+    ('residential cum commercial', 'residential cum commercial'),
     ('other','other')
 )
 
@@ -44,6 +44,7 @@ class Project(BaseModel):
     thumbnail_alt = models.CharField(max_length=125, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     rera_number=models.CharField(max_length=500,blank=True,null=True)
+    logo = models.ImageField(upload_to='projects/image',blank=True,null=True)
     qr_code=models.ImageField(upload_to='projects/image',blank=True,null=True)
     qr_code_alt = models.CharField(max_length=125, null=True, blank=True)
     location=models.CharField(max_length=500,blank=True,null=True) 

@@ -1,11 +1,12 @@
 from django.db import models
 import uuid
 from ckeditor.fields import RichTextField
+from datetime import datetime
 # Create your models here.
 
 class BaseModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    date_added = models.DateTimeField(db_index=True,auto_now_add=True)
+    date_added = models.DateTimeField(db_index=True,default=datetime.now, editable=True)
     date_updated = models.DateTimeField(auto_now_add=True)
     is_deleted = models.BooleanField(default=False)
 
