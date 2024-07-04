@@ -142,6 +142,9 @@ class ProjectApiView(APIView):
             data['qr_code'] = instance.qr_code
         if 'thumbnail' not in data or data['thumbnail'] == "":
             data['thumbnail'] = instance.thumbnail
+        if 'logo' not in data or data['logo'] == "":
+            data['logo'] = instance.logo
+            
         serializer = ProjectSerializer(instance, data=data,partial=True,context={'request': request})
 
         if serializer.is_valid():
