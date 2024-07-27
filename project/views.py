@@ -143,7 +143,7 @@ class ProjectApiView(APIView):
         if 'thumbnail' not in data or data['thumbnail'] == "":
             data['thumbnail'] = instance.thumbnail
         if 'logo' not in data or data['logo'] == "":
-            data['logo'] = instance.logo
+            data['logo'] = instance.logo if instance.logo else None
             
         serializer = ProjectSerializer(instance, data=data,partial=True,context={'request': request})
 
