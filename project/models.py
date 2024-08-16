@@ -14,7 +14,9 @@ PROJECT_TYPE_CHOICES = (
 
 PROJECT_STATUS_CHOICES = (
     ('new launch', 'new launch'),
+    ('on going', 'on going'),
     ('ready to occupy', 'ready to occupy'),
+    ('nearing completion', 'nearing completion'),
     ('under construction', 'under construction'),
     ('sold out', 'sold out'),
 )
