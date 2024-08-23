@@ -16,7 +16,7 @@ class AmenitiesSerializer(serializers.ModelSerializer):
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:  
         model = Project
-        fields = ['name', 'thumbnail','thumbnail_alt', 'description', 'rera_number', 'qr_code','qr_code_alt', 'location', 'company_branch', 'type', 'status', 'units', 'bedrooms', 'area_from', 'area_to', 'iframe', 'meta_title', 'meta_description', 'slug','logo']
+        fields = ['name', 'thumbnail','thumbnail_alt', 'description', 'rera_number', 'qr_code','qr_code_alt', 'location', 'company_branch', 'type', 'status', 'units', 'bedrooms', 'area_from', 'area_to', 'iframe', 'meta_title', 'meta_description', 'slug','logo','brochure']
 
     def clean_amenities(self):
         amenities = self.cleaned_data.get('amenities')
@@ -27,7 +27,7 @@ class ProjectSerializer(serializers.ModelSerializer):
 class ProjectListSerializer(serializers.ModelSerializer):
     class Meta:  
         model = Project
-        fields = ['id','name', 'thumbnail','thumbnail_alt', 'description', 'rera_number', 'qr_code','qr_code_alt', 'location', 'company_branch', 'type', 'status', 'units', 'bedrooms', 'area_from', 'area_to', 'iframe', 'meta_title', 'meta_description', 'slug','amenities','logo']
+        fields = ['id','name', 'thumbnail','thumbnail_alt', 'description', 'rera_number', 'qr_code','qr_code_alt', 'location', 'company_branch', 'type', 'status', 'units', 'bedrooms', 'area_from', 'area_to', 'iframe', 'meta_title', 'meta_description', 'slug','amenities','logo','brochure']
 
 class ProjectDropDownListSerializer(serializers.ModelSerializer):
     class Meta:  

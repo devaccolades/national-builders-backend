@@ -21,7 +21,7 @@ class ProjectSerializer(serializers.ModelSerializer):
     company_branch = CompanyBranchSerializer()
     class Meta:  
         model = project_models.Project
-        fields = ['id','name', 'thumbnail', 'thumbnail_alt','description', 'rera_number', 'qr_code','qr_code_alt', 'location', 'company_branch', 'type', 'status', 'units', 'bedrooms', 'area_from', 'area_to', 'iframe', 'meta_title', 'meta_description', 'slug','logo']
+        fields = ['id','name', 'thumbnail', 'thumbnail_alt','description', 'rera_number', 'qr_code','qr_code_alt', 'location', 'company_branch', 'type', 'status', 'units', 'bedrooms', 'area_from', 'area_to', 'iframe', 'meta_title', 'meta_description', 'slug','logo','brochure']
 
     def clean_amenities(self):
         amenities = self.cleaned_data.get('amenities')

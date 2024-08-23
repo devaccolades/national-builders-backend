@@ -5,6 +5,8 @@ urlpatterns = [
     
     path('projects/', ProjectsAPIView.as_view(), name='projects-api'),
     path('projects/<slug:slug>/', ProjectsAPIView.as_view(), name='projects-api'),
+    path('brochures/<uuid:pk>/download/', BrochureDownloadView.as_view(), name='brochure-download'),
+    
     
     path('branch-dropdown/', BranchDropDownAPIView.as_view(), name='branch-dropdown-api'),
     
