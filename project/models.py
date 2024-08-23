@@ -49,6 +49,7 @@ class Project(BaseModel):
     logo = models.ImageField(upload_to='projects/image',blank=True,null=True)
     qr_code=models.ImageField(upload_to='projects/image',blank=True,null=True)
     qr_code_alt = models.CharField(max_length=125, null=True, blank=True)
+    brochure = models.FileField(upload_to='projects/brochure',blank=True,null=True)
     location=models.CharField(max_length=500,blank=True,null=True) 
     company_branch = models.ForeignKey(CompanyBranch, on_delete=models.SET_NULL, null=True)
     type = models.CharField(choices=PROJECT_TYPE_CHOICES, max_length=255)

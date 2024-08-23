@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.core.mail import send_mail
 from django.template.loader import get_template
 from django.conf import settings
+from django.http import FileResponse, Http404
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -162,6 +163,21 @@ class ProjectsAPIView(APIView):
                 "message": f'Something went wrong {e}'
             }
             return Response(response_data,status=status.HTTP_200_OK)
+        
+"""
+sned Brochure details for user side
+"""
+class BrochureDownloadView(APIView):
+    def get(self, request, pk, format=None):
+        try:
+            project = project_models.Project.objects.get(pk=pk)
+            if project.brochure:
+                response = FileResponse(project.brochure, as_attachment=True, filename=project.brochure.name)
+                return response
+            else:
+                return Response({"detail": "Brochure not found"}, status=404)
+        except project_models.Project.DoesNotExist:
+            raise Http404
 
 class BranchDropDownAPIView(CompanyBranchDropdownListView):
     pass
