@@ -4,6 +4,8 @@ from django.template.loader import get_template
 from django.conf import settings
 from django.http import FileResponse, Http404
 
+from collections import defaultdict
+
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -133,6 +135,25 @@ class ProjectsAPIView(APIView):
                 distance_instance = project_models.ProjectDistance.objects.filter(project=instance.id, is_deleted=False)
                 distance_serializer = project_serializer.DistanceSerializer(distance_instance, many=True)
 
+                status_instance = project_models.CurrentStatus.objects.filter(project=instance, is_deleted=False).order_by('-year', '-month')
+                status_serializer = project_serializer.CurrentStatusSerializer(status_instance, many=True, context={'request': request})            
+                month_order = {month: index for index, (month, _) in enumerate(project_models.Month_CHOICES)}
+
+                grouped_data = defaultdict(list)
+                for item in status_serializer.data:
+                    year = item['year']
+                    status_data = {
+                        'id': item['id'],
+                        'image': item['image'],
+                        'image_alt': item['image_alt'],
+                        'month': item['month'].capitalize()
+                    }
+                    grouped_data[year].append(status_data)  
+
+                status_array = [
+                    {"year": year, "statuses": sorted(statuses, key=lambda x: -month_order[x['month'].lower()])}
+                    for year, statuses in sorted(grouped_data.items(), reverse=True)
+                ]
                 response_data={
                     "StatusCode": 6000,
                     "detail": "success",
@@ -142,6 +163,7 @@ class ProjectsAPIView(APIView):
                     "amenities": amenities_serializer.data,
                     "specification": specification_serializer.data,
                     "distance": distance_serializer.data,
+                    "status": status_array,
                     "message": "Project's Data fetched successfully"
 
                 }

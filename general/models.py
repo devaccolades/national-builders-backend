@@ -51,11 +51,20 @@ class KeyHandOver(BaseModel):
         
     
 class Testimonials(BaseModel):
-    name = models.CharField(max_length=255,null=True,blank=True)
-    image = models.ImageField(upload_to='testimonials/image', null=True, blank=True)
-    image_alt = models.CharField(max_length=125, null=True, blank=True)
-    project=models.ForeignKey('project.Project',on_delete=models.CASCADE,null=True,blank=True)
+    MEDIA_CHOICES = (
+        ('image', 'Image'),
+        ('video', 'Video'),
+    )
+
+    name = models.CharField(max_length=255, null=True, blank=True)
+    media_type = models.CharField(max_length=5, choices=MEDIA_CHOICES, default='image')  # Choose between 'image' or 'video'
+    image = models.ImageField(upload_to='testimonials/image', null=True, blank=True)  # Image field
+    thumbnail = models.ImageField(upload_to='testimonials/thumbnail', null=True, blank=True)  # Thumbnail for videos
+    image_alt = models.CharField(max_length=125, null=True, blank=True)  # Alt text for the image
+    video = models.FileField(upload_to='testimonials/video', null=True, blank=True)  # Video field
+    project = models.ForeignKey('project.Project', on_delete=models.CASCADE, null=True, blank=True)
     description = models.TextField(null=True, blank=True)
+
 
     class Meta:
         db_table = 'Testimonials'
@@ -64,7 +73,7 @@ class Testimonials(BaseModel):
         ordering = ('-date_added',)
 
     def __str__(self):
-        return self.name
+        return self.name if self.name else self.id
 
 class Blogs(BaseModel):
     image=models.ImageField(upload_to='blogs/image',blank=True,null=True)

@@ -146,3 +146,9 @@ class RentalEnquiryDownloadSerializer(serializers.ModelSerializer):
                 name += ' '
             name += obj.last_name
         return name
+
+
+class CurrentStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CurrentStatus
+        fields = ['id','project', 'year', 'month', 'image', 'image_alt']

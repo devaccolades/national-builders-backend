@@ -26,6 +26,21 @@ PROJECT_DISTANCE_CHOICES = (
     ('meter', 'meter'),
 )
 
+Month_CHOICES = (
+    ('january', 'January'),
+    ('february', 'February'),
+    ('march', 'March'),
+    ('april', 'April'),
+    ('may', 'May'),
+    ('june', 'June'),
+    ('july', 'July'),
+    ('august', 'August'),
+    ('september', 'September'),
+    ('october', 'October'),
+    ('november', 'November'),
+    ('december', 'December'),
+)
+
 
 
 class ProjectAmenities(BaseModel):
@@ -138,6 +153,22 @@ class Rentals(BaseModel):
 
     def __str__(self):
         return str(self.name)
+    
+class CurrentStatus(BaseModel):
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    year = models.BigIntegerField(null=True, blank=True)
+    month = models.CharField(choices=Month_CHOICES, max_length=100) 
+    image = models.ImageField(upload_to='projects/images/')
+    image_alt = models.CharField(max_length=125, null=True, blank=True)
+
+    class Meta:
+        db_table = 'projects.project_current_status'
+        verbose_name = 'Current Status'
+        verbose_name_plural = 'Current Statuses'
+        ordering = ('-date_added',)
+
+    def __str__(self):
+        return f"{self.month} {self.year}"
 
 class Enquiry(models.Model):
     project=models.ForeignKey(Project,on_delete=models.CASCADE,null=True,blank=True)

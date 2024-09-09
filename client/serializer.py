@@ -7,7 +7,7 @@ class TestimonialsSeralizer(serializers.ModelSerializer):
     project = serializers.SerializerMethodField()
     class Meta:
         model = general_models.Testimonials
-        fields = ['id', 'image','name','project','description','image_alt']
+        fields = ['id', 'image','name','image','project','description','image_alt','media_type','video','thumbnail']
 
     def get_project(self, obj):
         return obj.project.name
