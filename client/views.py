@@ -324,19 +324,26 @@ class EnquiryAPIView(APIView):
         
 
 class TestimonialsAPIView(APIView):
-    def get (self,request):
-       
+    def get(self, request):
+        media_type = request.GET.get('media_type') 
         try:
-            start_limit = int(request.query_params.get('start_limit',0))
-            end_limit = int(request.query_params.get('end_limit',3))
-            instances = general_model.Testimonials.objects.filter(is_deleted=False)[start_limit:end_limit]
-            total_count = general_model.Testimonials.objects.filter(is_deleted=False).count()
-            serializer = client_serialzer.TestimonialsSeralizer(instances, many=True,context={'request': self.request})
+            if media_type == 'image':
+                start_limit = int(request.query_params.get('start_limit', 0))
+                end_limit = int(request.query_params.get('end_limit', 3))
+                instances = general_model.Testimonials.objects.filter(is_deleted=False, media_type='image')[start_limit:end_limit]
+            elif media_type == 'video': 
+                instances = general_model.Testimonials.objects.filter(is_deleted=False, media_type='video')
+            else:
+                return Response({"StatusCode": 6001, "detail": "Invalid media type"}, status=status.HTTP_400_BAD_REQUEST)
+            
+            total_count = general_model.Testimonials.objects.filter(is_deleted=False, media_type=media_type).count()
+            serializer = client_serialzer.TestimonialsSeralizer(instances, many=True, context={'request': self.request})
+            
             response_data = {
                 "StatusCode": 6000,
                 "detail": "Success",
                 "data": serializer.data,
-                "total_count" : total_count,
+                "total_count": total_count if media_type == 'image' else len(serializer.data),  # Return total count for images
                 "message": "Testimonials Data fetched successfully"
             }
             return Response(response_data, status=status.HTTP_200_OK)
@@ -344,10 +351,11 @@ class TestimonialsAPIView(APIView):
             response_data = {
                 "StatusCode": 6002,
                 "detail": "error",
-                "data" : "",
+                "data": "",
                 "message": f"Failed to fetch Testimonials Data: {str(e)}"
             }
             return Response(response_data, status=status.HTTP_200_OK)
+
 
 
 class BlogsAPIView(APIView):
