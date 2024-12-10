@@ -18,7 +18,7 @@ from project import serializer as project_serializer
 from . import serializer as client_serialzer
 from general.views import CompanyBranchDropdownListView
 
-from utils.helper import get_client_ip, send_to_qleads_api
+# from utils.helper import get_client_ip, send_to_qleads_api
 
 class DataAPIView(APIView):
     def get_project_counts(self):
@@ -250,7 +250,7 @@ class RentalsEnquiryAPIView(APIView):
                     'Enquiry Data',
                     None, 
                     settings.EMAIL_HOST_USER,
-                    ['smm@nationalbuilders.in','leadsaccolades@gmail.com'],
+                    ['smm@nationalbuilders.in'],
                     fail_silently=False,
                     html_message = template,
                     )
@@ -303,7 +303,7 @@ class EnquiryAPIView(APIView):
                     'Enquiry Data',
                     None, 
                     settings.EMAIL_HOST_USER,
-                    ['smm@nationalbuilders.in','leadsaccolades@gmail.com'],
+                    ['smm@nationalbuilders.in'],
                     fail_silently=False,
                     html_message = template,
                     )
