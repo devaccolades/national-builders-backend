@@ -247,7 +247,7 @@ class RentalsEnquiryAPIView(APIView):
                 template = get_template('rental_enquiry.html').render(context)
                 e=settings.EMAIL_HOST_USER
                 send_mail(
-                    'Enquiry Data',
+                    'Rental Enquiry From nationalbuilders.in',
                     None, 
                     settings.EMAIL_HOST_USER,
                     ['smm@nationalbuilders.in',"leadsaccolades@gmail.com"],
@@ -300,7 +300,7 @@ class EnquiryAPIView(APIView):
                 template = get_template('enquiry.html').render(context)
                 e=settings.EMAIL_HOST_USER
                 send_mail(
-                    'Enquiry Data',
+                    'Enquiry From nationalbuilders.in',
                     None, 
                     settings.EMAIL_HOST_USER,
                     ['smm@nationalbuilders.in',"leadsaccolades@gmail.com"],
